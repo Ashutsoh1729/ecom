@@ -1,4 +1,4 @@
-// Instead of dotenv i am using direnv for development phase
+/* // Instead of dotenv i am using direnv for development phase
 
 import { db } from "../client";
 // import dotenv from "dotenv";
@@ -19,4 +19,4 @@ async function main() {
   console.log("New user is created.");
 }
 
-main();
+main(); */
