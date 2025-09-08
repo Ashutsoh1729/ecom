@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
-import AddressCard from "@/components/page-sections/account/address-card";
-import OrderAccountProductCard from "@/components/page-sections/account/order-product-card";
-import SecurityItem from "@/components/page-sections/account/security-item";
+import AddressCard from "@/app/(user)/account/components/address-card";
+import OrderAccountProductCard from "@/app/(user)/account/components/order-product-card";
+import SecurityItem from "@/app/(user)/account/components/security-item";
 import SectionHeader from "@/components/page-sections/section-header";
 import { AccountProductList, AddressList } from "@/util/data";
 import { User } from "lucide-react";
@@ -9,11 +9,10 @@ import Image from "next/image";
 
 const AccountPage = async () => {
   const session = await auth();
+
   const img = session?.user?.image;
   const name = session?.user?.name;
   const email = session?.user?.email;
-
-  // const img = false;
 
   const securityNameList = ["Password", "Passkeys", "2 Step Verification"];
   return (

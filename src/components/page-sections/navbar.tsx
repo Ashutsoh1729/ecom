@@ -10,6 +10,7 @@ import { Heart, ShoppingBag } from "lucide-react";
 const Navbar = () => {
   const router = useRouter();
   const { data: session } = useSession();
+
   const handleSignIn = () => {
     router.push("/auth/sign-in");
   };
@@ -32,8 +33,7 @@ const Navbar = () => {
                 width={30}
                 height={30}
               />
-              K
-            </span>
+              K </span>
           </div> */}
           <div id="nav-icons" className="flex items-center h-full gap-4  ">
             <Heart
@@ -41,7 +41,7 @@ const Navbar = () => {
               strokeWidth={1.5}
               className="hover:cursor-pointer"
               onClick={() => {
-                router.push("/likes");
+                // router.push("/likes");
               }}
             />
             <ShoppingBag

@@ -1,8 +1,5 @@
 import { ProductCardInterface } from "@/components/util/product-card";
-import {
-  Address,
-  AddressType,
-} from "@/components/page-sections/account/address-card";
+import { Address, AddressType } from "./types/address";
 
 export interface navLink {
   name: string;
@@ -109,3 +106,5 @@ export const AddressList: Address[] = [
     country: "USA",
   },
 ];
+
+console.log(AddressList[0].type);

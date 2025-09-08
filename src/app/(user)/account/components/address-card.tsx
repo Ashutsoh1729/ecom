@@ -1,20 +1,7 @@
 "use client";
 
-export enum AddressType {
-  home = "HOME",
-  default = "DEFAULT",
-  work = "WORK",
-}
-export interface Address {
-  type: AddressType | null;
-  addressLane1: string;
-  addressLane2?: string;
-  landmark?: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-}
+import { Address, AddressType } from "@/util/types/address";
+
 const AddressCard = ({
   address,
   recipientName,
@@ -27,6 +14,8 @@ const AddressCard = ({
     [AddressType.work]: "Work",
     [AddressType.default]: "Default",
   };
+
+  console.log(address?.type);
 
   const handleAddNew = () => {
     console.log("A new address will be added");
@@ -63,7 +52,7 @@ const AddressCard = ({
     <>
       <div className="col-span-1 px-4 py-2 border-2 border-gray-400 rounded-md">
         <div>
-          <div>{address.type ? AddressTypeLabels[address.type] : null}</div>
+          <div>{address.type && AddressTypeLabels[address.type]}</div>
         </div>
         <div id="card-container" className="text-sm flex flex-col gap-3 h-full">
           {recipientName && (

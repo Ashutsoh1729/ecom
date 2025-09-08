@@ -5,8 +5,15 @@ import {
   text,
   primaryKey,
   integer,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "@auth/core/adapters";
+
+// -- Enum Declaration --
+
+const userRole = pgEnum("user_role", ["Seller", "Buyer"]);
+
+// -- Authentication --
 
 export const users = pgTable("user", {
   id: text("id")
@@ -90,3 +97,5 @@ export const authenticators = pgTable(
     },
   ],
 );
+
+export const seller = pgTable({});

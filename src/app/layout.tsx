@@ -4,6 +4,8 @@ import "./globals.css";
 import Navbar from "@/components/page-sections/navbar";
 import { SessionProvider } from "next-auth/react";
 import Breadcrumb from "@/components/page-sections/breadcrumbs";
+import ModalManager from "@/components/page-sections/modal-manager";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -47,6 +49,8 @@ export default async function RootLayout({
         {/* <Navbar2 /> */}
 
         <Breadcrumb />
+        <ModalManager />
+        <Toaster />
         <main>{children}</main>
       </body>
     </html>

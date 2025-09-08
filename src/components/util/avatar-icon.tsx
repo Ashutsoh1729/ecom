@@ -11,7 +11,7 @@ import {
 } from "../ui/dropdown-menu";
 import { User } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { handleBecomingSeller } from "@/util/logic";
+import { useModalStore } from "@/util/states/modal";
 
 interface AvatarIconInterface {
   img?: string;
@@ -19,6 +19,8 @@ interface AvatarIconInterface {
 
 const AvatarIcon = ({ img }: AvatarIconInterface) => {
   const router = useRouter();
+
+  const { openModal } = useModalStore();
 
   return (
     <>
@@ -46,11 +48,7 @@ const AvatarIcon = ({ img }: AvatarIconInterface) => {
           >
             Orders
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => {
-              handleBecomingSeller();
-            }}
-          >
+          <DropdownMenuItem onClick={() => openModal("sellerCreating")}>
             Be a Seller
           </DropdownMenuItem>
           <DropdownMenuSeparator />
