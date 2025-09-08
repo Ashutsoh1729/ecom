@@ -1,6 +1,6 @@
 {
-  "id": "8ecaed9d-e706-4b9a-ad52-649253d35b39",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "84b20926-f05d-4376-844c-5aa7b22d6d2f",
+  "prevId": "8ecaed9d-e706-4b9a-ad52-649253d35b39",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -573,6 +573,13 @@
         },
         "is_verified": {
           "name": "is_verified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "agreed_to_terms": {
+          "name": "agreed_to_terms",
           "type": "boolean",
           "primaryKey": false,
           "notNull": true,

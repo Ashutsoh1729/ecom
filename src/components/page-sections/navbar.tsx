@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 import AvatarIcon from "../util/avatar-icon";
 import { Heart, ShoppingBag } from "lucide-react";
 
-const Navbar = () => {
+const Navbar = ({ userRole }: { userRole: "Buyer" | "Seller" }) => {
   const router = useRouter();
   const { data: session } = useSession();
 
@@ -57,6 +57,7 @@ const Navbar = () => {
             {session?.user ? (
               <AvatarIcon
                 img={session.user.image ? session.user.image : undefined}
+                role={userRole}
               />
             ) : (
               <div className="flex gap-3">

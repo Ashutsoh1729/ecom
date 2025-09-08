@@ -15,12 +15,18 @@ import { useModalStore } from "@/util/states/modal";
 
 interface AvatarIconInterface {
   img?: string;
+  role: "Buyer" | "Seller";
 }
 
-const AvatarIcon = ({ img }: AvatarIconInterface) => {
+const AvatarIcon = ({ img, role = "Buyer" }: AvatarIconInterface) => {
   const router = useRouter();
 
   const { openModal } = useModalStore();
+  const handleRoleButton = () => {
+    if (role === "Buyer") {
+      openModal("sellerCreating");
+    }
+  };
 
   return (
     <>
@@ -48,8 +54,8 @@ const AvatarIcon = ({ img }: AvatarIconInterface) => {
           >
             Orders
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => openModal("sellerCreating")}>
-            Be a Seller
+          <DropdownMenuItem onClick={handleRoleButton}>
+            {role === "Buyer" ? "Be a Seller" : "Switch to Buyer"}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem

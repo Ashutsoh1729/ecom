@@ -119,3 +119,29 @@ Just to be absolutely sure, do the clean reset one last time.
 You have broken the circular dependency. Now, both your data file and your component file depend on a simple, neutral `types.ts` file. There is no loop. The Next.js build process will now load your files in a clean, predictable order, and the `AddressType` enum will be available when `data.ts` needs it.
 
 This has been a marathon debugging session. This type of bug is one of the hardest to find. Your final test proved the cause beyond any doubt. It is now 10 PM on a Sunday in Rourkela; you have earned a break\! This architectural change is the correct and final solution.
+
+# sellerId: text("seller_id") .notNull() .references(() => sellers.id, { onDelete: "cascade" }),
+
+## Query: doesn't cascade means, that when someone will delete the store his seller account will get deleted?if a seller has 2 accounts, then why should his seller account should get deleted?? Only when his account don't have any store, then it should get deleted??
+
+That's an excellent and very important question. You're thinking exactly like a database designer, considering what happens when data is deleted. It's crucial to get this right.
+
+You've actually spotted a common point of confusion, and it's great that you're asking about it. The `onDelete: "cascade"` behavior flows in the other direction.
+
+Let's use an analogy. Think of the `seller` as a filing cabinet and each `store` as a folder inside that cabinet.
+
+- The rule `onDelete: "cascade"` is on the _folder_ (`store`).
+- It means: If you destroy the entire **filing cabinet (`seller`)**, then all the **folders (`stores`)** inside it are automatically destroyed too.
+
+It does **not** mean that if you throw away one folder (`store`), the whole filing cabinet (`seller`) gets destroyed.
+
+So, in your schema:
+
+1.  If a seller deletes their entire `seller` account, `onDelete: "cascade"` will automatically delete all the `stores` they owned. This is usually what you want, to keep the database clean.
+2.  If a seller has two stores and deletes just **one store**, their `seller` account and their other store are completely unaffected.
+
+Regarding your second point: _"Only when his account don't have any store, then it should get deleted??"_
+
+That's a piece of business logic that you would handle in your application code, not in the database schema itself. The database's cascade rule won't automatically delete a seller just because their last store is gone. You would write code that says, "When a store is deleted, check if the seller has any other stores left. If not, then maybe prompt them about deleting their seller account."
+
+Does that distinction between the database rule and the application logic make sense?

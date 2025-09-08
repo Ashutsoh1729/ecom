@@ -1,0 +1,1 @@
+ALTER TABLE "sellers" ADD COLUMN "agreed_to_terms" boolean DEFAULT false NOT NULL;

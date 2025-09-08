@@ -14,32 +14,22 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useModalStore } from "@/util/states/modal";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 // 1. Define the validation schema with Zod
-const formSchema = z.object({
-  storeName: z.string().min(3, {
-    message: "store name must be at least 3 characters.",
-  }),
-  storeDescription: z
-    .string()
-    .min(20, {
-      message: "Description must be at least 20 characters.",
-    })
-    .max(500, {
-      message: "Description cannot exceed 500 characters.",
-    }),
-  businessAddress: z.string().min(10, {
-    message: "Please enter a full business address.",
+export const sellerFormSchema = z.object({
+  businessName: z.string().min(3, {
+    message: "business name must be at least 3 characters.",
   }),
   phoneNumber: z.string().regex(/^\d{10}$/, {
     message: "Please enter a valid 10-digit mobile number.",
   }),
-  gstin: z.string().optional(),
+  stripeAccountId: z.string().regex(/^[a-z]{2,10}_[a-zA-Z0-9]{14,255}$/, {
+    message: "Please enter a valid stripe id",
+  }),
   agreedToTerms: z.boolean().refine((val) => val === true, {
     message: "You must agree to the Seller Terms of Service.",
   }),
@@ -49,27 +39,42 @@ const SellerApplicationModal = () => {
   const { closeModal } = useModalStore();
 
   // 2. Set up the form using React Hook Form and the Zod resolver
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof sellerFormSchema>>({
+    resolver: zodResolver(sellerFormSchema),
     defaultValues: {
-      storeName: "",
-      storeDescription: "",
-      businessAddress: "",
+      businessName: "",
       phoneNumber: "",
-      gstin: "",
+      stripeAccountId: "",
       agreedToTerms: false,
     },
   });
 
   // 3. Define the submit handler
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(data: z.infer<typeof sellerFormSchema>) {
     // In a real app, you would send this 'values' object to your backend API
-    console.log("Submitting validated seller application:", values);
-    // alert("Application submitted successfully! We will review it shortly.");
-    toast("Application submitted successfully!", {
-      description: "We will review it and reach to you shortly.",
-    });
-    closeModal(); // Close the modal on successful submission
+    try {
+      console.log("Submitting validated seller application:", data);
+      const response = await fetch("/api/seller/create-account/", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+      const result = await response.json();
+      console.log(result);
+      // alert("Application submitted successfully! We will review it shortly.");
+      toast("Application submitted successfully!", {
+        description: "We will review it and reach to you shortly.",
+      });
+      closeModal(); // Close the modal on successful submission
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log("Some error happen", error.message);
+      } else {
+        console.log("Some unknown error has happened.");
+      }
+    }
   }
 
   return (
@@ -85,44 +90,12 @@ const SellerApplicationModal = () => {
         <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 space-y-4">
           <FormField
             control={form.control}
-            name="storeName"
+            name="businessName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Store Name</FormLabel>
+                <FormLabel>Business Name</FormLabel>
                 <FormControl>
                   <Input placeholder="e.g., Rourkela Handcrafts" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="storeDescription"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Store Description</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Describe what makes your products special..."
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="businessAddress"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Business Address</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Your complete business address"
-                    {...field}
-                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -143,23 +116,18 @@ const SellerApplicationModal = () => {
           />
           <FormField
             control={form.control}
-            name="gstin"
+            name="stripeAccountId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>GSTIN</FormLabel>
+                <FormLabel>Stripe Account Id</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="15-digit GST Identification Number (Optional)"
-                    {...field}
-                  />
+                  <Input placeholder="valid stripe account id" {...field} />
                 </FormControl>
-                <FormDescription>
-                  Optional, but recommended for business sellers.
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="agreedToTerms"
@@ -182,6 +150,7 @@ const SellerApplicationModal = () => {
               </FormItem>
             )}
           />
+
           <Button type="submit" className="w-full bg-blue-600">
             Submit
           </Button>

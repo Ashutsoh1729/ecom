@@ -1,6 +1,6 @@
 {
-  "id": "8ecaed9d-e706-4b9a-ad52-649253d35b39",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "cf54a537-5a21-453f-b4b1-48db727f512c",
+  "prevId": "84b20926-f05d-4376-844c-5aa7b22d6d2f",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -565,6 +565,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "phone_number": {
+          "name": "phone_number",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
         "stripe_account_id": {
           "name": "stripe_account_id",
           "type": "text",
@@ -573,6 +579,13 @@
         },
         "is_verified": {
           "name": "is_verified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "agreed_to_terms": {
+          "name": "agreed_to_terms",
           "type": "boolean",
           "primaryKey": false,
           "notNull": true,
@@ -611,6 +624,13 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
+        "sellers_phone_number_unique": {
+          "name": "sellers_phone_number_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "phone_number"
+          ]
+        },
         "sellers_stripe_account_id_unique": {
           "name": "sellers_stripe_account_id_unique",
           "nullsNotDistinct": false,

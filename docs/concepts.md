@@ -536,3 +536,7 @@ This creates a direct link between the text "Airplane Mode" and the switch next 
 2.  **Accessibility (Crucial!):** Screen readers for visually impaired users rely on this link. When the user navigates to the switch, the screen reader will read the label's text aloud ("Airplane Mode"). Without `htmlFor`, it might just say "switch," which is useless.
 
 **(Note:** In standard HTML, this attribute is called `for`. It's named `htmlFor` in React/JSX because `for` is a reserved keyword for loops in JavaScript.)
+
+# 4. Slugs for identification
+
+# 5. Difference between categories and tags in database design
