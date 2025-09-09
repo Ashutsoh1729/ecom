@@ -52,7 +52,9 @@ export const accounts = pgTable(
     },
   ],
 );
-
+/* 
+ * -- Not needed as we have transitioned to the jwt strategy --
+ *
 export const sessions = pgTable("session", {
   sessionToken: text("sessionToken").primaryKey(),
   userId: text("userId")
@@ -60,7 +62,7 @@ export const sessions = pgTable("session", {
     .references(() => users.id, { onDelete: "cascade" }),
   expires: timestamp("expires", { mode: "date" }).notNull(),
 });
-
+ */
 export const verificationTokens = pgTable(
   "verificationToken",
   {

@@ -9,13 +9,7 @@ const AddressCard = ({
   address?: Address;
   recipientName?: string | null;
 }) => {
-  const AddressTypeLabels: Record<AddressType, string> = {
-    [AddressType.home]: "Home",
-    [AddressType.work]: "Work",
-    [AddressType.default]: "Default",
-  };
-
-  console.log(address?.type);
+  // console.log(address?.type);
 
   const handleAddNew = () => {
     console.log("A new address will be added");
@@ -51,8 +45,10 @@ const AddressCard = ({
   return (
     <>
       <div className="col-span-1 px-4 py-2 border-2 border-gray-400 rounded-md">
-        <div>
-          <div>{address.type && AddressTypeLabels[address.type]}</div>
+        <div className="border-b-slate-400 border-b-2">
+          <div className="text-slate-500 font-medium text-sm">
+            {address.type}
+          </div>
         </div>
         <div id="card-container" className="text-sm flex flex-col gap-3 h-full">
           {recipientName && (

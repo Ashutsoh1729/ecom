@@ -4,6 +4,7 @@ import { db } from "@/db/client";
 import { sellers, users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 
 export async function createNewSellerAccount(
@@ -49,6 +50,8 @@ export async function createNewSellerAccount(
       .update(users)
       .set({ role: "Seller" })
       .where(eq(users.id, session.user.id));
+
+    redirect("/dashboard");
   } catch (err) {
     if (err instanceof Error) {
       console.log("error happen while updating the user role", err.message);

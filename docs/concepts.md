@@ -540,3 +540,39 @@ This creates a direct link between the text "Airplane Mode" and the switch next 
 # 4. Slugs for identification
 
 # 5. Difference between categories and tags in database design
+
+# 6. Typescript Declaration Files
+
+Declaring types for session objects and jwt token object used in auth.ts
+
+code:
+
+```ts
+// auth.d.ts
+//
+//This file doesn't run any code. It just gives TypeScript new rules, essentially saying, "By the way, from now on, whenever you see a Session object or a JWT token from next-auth, expect it to have a role property."
+
+import "next-auth";
+
+declare module "next-auth" {
+  /**
+   * Extends the built-in session.user object to include the 'role' property.
+   */
+  interface Session {
+    user: {
+      role: "Buyer" | "Seller";
+    } & DefaultSession["user"];
+  }
+}
+
+declare module "next-auth/jwt" {
+  /**
+   * Extends the built-in JWT token to include the 'role' property.
+   */
+  interface JWT {
+    role: "Buyer" | "Seller";
+  }
+}
+```
+
+This file doesn't run any code. It just gives TypeScript new rules, essentially saying, "By the way, from now on, whenever you see a Session object or a JWT token from next-auth, expect it to have a role property."

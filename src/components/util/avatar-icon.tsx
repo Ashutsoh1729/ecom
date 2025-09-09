@@ -49,6 +49,14 @@ const AvatarIcon = ({ img, role = "Buyer" }: AvatarIconInterface) => {
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
+              router.push("/dashboard");
+            }}
+          >
+            Dashboard
+          </DropdownMenuItem>
+
+          <DropdownMenuItem
+            onClick={() => {
               router.push("/orders");
             }}
           >

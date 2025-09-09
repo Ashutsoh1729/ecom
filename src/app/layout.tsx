@@ -6,10 +6,8 @@ import { SessionProvider } from "next-auth/react";
 import Breadcrumb from "@/components/page-sections/breadcrumbs";
 import ModalManager from "@/components/page-sections/modal-manager";
 import { Toaster } from "@/components/ui/sonner";
-import { db } from "@/db/client";
-import { userRole, users } from "@/db/schema";
-import { eq } from "drizzle-orm";
-import { auth } from "@/auth";
+import { getUserRole } from "@/lib/logic";
+import { redirect } from "next/navigation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,21 +40,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth();
-  const userId = session?.user?.id;
+  const userRole = await getUserRole();
+  console.log(userRole);
 
-  let userRole: "Seller" | "Buyer";
-
-  if (userId) {
-    const roleData = await db
-      .select({ role: users.role })
-      .from(users)
-      .where(eq(users.id, userId));
-    userRole = roleData[0].role;
-  } else {
-    userRole = "Buyer";
-  }
-
+  // If you find the user as seller, send him directly to the dashboard
   return (
     <html lang="en">
       <body

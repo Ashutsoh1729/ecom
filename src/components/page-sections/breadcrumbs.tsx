@@ -18,8 +18,8 @@ const Breadcrumb = () => {
   // console.log(segments);
 
   return (
-    <nav aria-label="breadcrumb" className="px-16 py-3 bg-slate-200">
-      <ol className="flex items-center space-x-2 text-sm font-bold text-gray-500 ">
+    <nav aria-label="breadcrumb" className="px-16 py-2 bg-slate-200">
+      <ol className="flex items-center space-x-2 text-[12px] font-medium text-gray-500 ">
         {/* Home Link */}
         <li>
           <Link href="/" className="hover:text-blue-600 hover:underline">
