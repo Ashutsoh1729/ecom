@@ -8,6 +8,8 @@ Here i will maintain the documentation and the learning i have during the projec
 4. drizzle orm
 5. neon database
 6. auth.js for authentication
+7. zod for data validation
+8. zustand for global state management
 
 # how to make my next app listen to keystrokes and respond ( like opening a modal and escaping from it ). I want a short answer with reference.
 

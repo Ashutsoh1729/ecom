@@ -10,6 +10,7 @@ import { Heart, ShoppingBag } from "lucide-react";
 const Navbar = ({ userRole }: { userRole: "Buyer" | "Seller" }) => {
   const router = useRouter();
   const { data: session } = useSession();
+  console.log(`The session data is: ${session?.expires}`);
 
   const handleSignIn = () => {
     router.push("/auth/sign-in");

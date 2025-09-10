@@ -2,16 +2,18 @@
 
 import { useModalStore } from "@/util/states/modal";
 import { EditProfileModal, LoginModal } from "./text-components";
-import SellerApplicationModal from "../util/modals/seller-modal";
-import { Cross, X } from "lucide-react";
+import SellerApplicationModal from "../modals/create-seller-modal";
+import { X } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
+import CreateStoreModal from "../modals/create-store-modal";
 
 // A mapping from modal type to the actual component
 const modalComponents = {
   login: LoginModal,
   editProfile: EditProfileModal,
   sellerCreating: SellerApplicationModal,
+  storeCreating: CreateStoreModal,
 };
 
 const ModalManager = () => {
@@ -28,7 +30,7 @@ const ModalManager = () => {
     // Your common wrapper with the dark overlay and centering
 
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 "
+      className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 max-h-[90vh] overflow-y-auto "
       onClick={closeModal}
     >
       <div

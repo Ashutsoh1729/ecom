@@ -1,7 +1,11 @@
 import { create } from "zustand";
 
 // 1. Define the possible modal types
-export type ModalType = "login" | "editProfile" | "sellerCreating";
+export type ModalType =
+  | "login"
+  | "editProfile"
+  | "sellerCreating"
+  | "storeCreating";
 
 interface ModalState {
   activeModal: ModalType | null; // 2. State now holds the type of modal, or null

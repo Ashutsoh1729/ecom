@@ -1,13 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter, Alkatra } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/page-sections/navbar";
-import { SessionProvider } from "next-auth/react";
-import Breadcrumb from "@/components/page-sections/breadcrumbs";
 import ModalManager from "@/components/page-sections/modal-manager";
 import { Toaster } from "@/components/ui/sonner";
-import { getUserRole } from "@/lib/logic";
-import { redirect } from "next/navigation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,21 +35,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const userRole = await getUserRole();
-  console.log(userRole);
-
   // If you find the user as seller, send him directly to the dashboard
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${fontAlkatra.variable} ${interSans.variable} antialiased`}
       >
-        <SessionProvider>
-          <Navbar userRole={userRole} />
-        </SessionProvider>
-        {/* <Navbar2 /> */}
-
-        <Breadcrumb />
         <ModalManager />
         <Toaster />
         <main>{children}</main>

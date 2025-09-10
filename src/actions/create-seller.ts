@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { sellerFormSchema } from "@/components/util/modals/seller-modal";
+import { sellerFormSchema } from "@/components/modals/create-seller-modal";
 import { db } from "@/db/client";
 import { sellers, users } from "@/db/schema";
 import { eq } from "drizzle-orm";

@@ -11,6 +11,7 @@ declare module "next-auth" {
   interface Session {
     user: {
       role: "Buyer" | "Seller";
+      sellerId: string;
     } & DefaultSession["user"];
   }
 }
@@ -21,5 +22,6 @@ declare module "next-auth/jwt" {
    */
   interface JWT {
     role: "Buyer" | "Seller";
+    sellerId: string;
   }
 }

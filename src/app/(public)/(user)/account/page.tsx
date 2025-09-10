@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
-import AddressCard from "@/app/(user)/account/components/address-card";
-import OrderAccountProductCard from "@/app/(user)/account/components/order-product-card";
-import SecurityItem from "@/app/(user)/account/components/security-item";
+import AddressCard from "@/app/(public)/(user)/account/components/address-card";
+import OrderAccountProductCard from "@/app/(public)/(user)/account/components/order-product-card";
+import SecurityItem from "@/app/(public)/(user)/account/components/security-item";
 import SectionHeader from "@/components/page-sections/section-header";
 import { AccountProductList, AddressList } from "@/util/data";
 import { User } from "lucide-react";

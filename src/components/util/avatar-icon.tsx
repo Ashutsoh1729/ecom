@@ -26,6 +26,9 @@ const AvatarIcon = ({ img, role = "Buyer" }: AvatarIconInterface) => {
     if (role === "Buyer") {
       openModal("sellerCreating");
     }
+    if (role === "Seller") {
+      router.push("/");
+    }
   };
 
   return (
@@ -47,6 +50,8 @@ const AvatarIcon = ({ img, role = "Buyer" }: AvatarIconInterface) => {
           >
             Account
           </DropdownMenuItem>
+
+          {/* {role === "Buyer" && ( */}
           <DropdownMenuItem
             onClick={() => {
               router.push("/dashboard");
@@ -54,17 +59,28 @@ const AvatarIcon = ({ img, role = "Buyer" }: AvatarIconInterface) => {
           >
             Dashboard
           </DropdownMenuItem>
+          {/* )} */}
 
-          <DropdownMenuItem
-            onClick={() => {
-              router.push("/orders");
-            }}
-          >
-            Orders
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleRoleButton}>
-            {role === "Buyer" ? "Be a Seller" : "Switch to Buyer"}
-          </DropdownMenuItem>
+          {role === "Buyer" && (
+            <DropdownMenuItem
+              onClick={() => {
+                router.push("/orders");
+              }}
+            >
+              Orders
+            </DropdownMenuItem>
+          )}
+
+          {role === "Buyer" ? (
+            <DropdownMenuItem onClick={handleRoleButton}>
+              Be a Seller
+            </DropdownMenuItem>
+          ) : (
+            <DropdownMenuItem onClick={handleRoleButton}>
+              Switch to Buyer
+            </DropdownMenuItem>
+          )}
+
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => {

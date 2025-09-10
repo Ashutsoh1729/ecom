@@ -133,7 +133,7 @@ export const stores = pgTable("stores", {
     .$defaultFn(() => crypto.randomUUID()),
   sellerId: text("seller_id")
     .notNull()
-    .references(() => users.id, { onDelete: "set null" }),
+    .references(() => sellers.id, { onDelete: "set null" }),
 
   // -- store specification details --
 

@@ -8,7 +8,7 @@ export interface SectionHeaderInterface {
   name: string;
   hasCTA: boolean;
   ctaName?: string;
-  hasIcon: boolean;
+  hasIcon?: boolean;
   iconType?: "leading" | "trailing" | "icon only";
   iconAddr?: string;
   iconComponent?: ReactNode;
