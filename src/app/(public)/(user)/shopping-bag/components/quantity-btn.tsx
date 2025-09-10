@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useProductQuantity } from "@/util/states/product";
 import { Minus, Plus } from "lucide-react";
 
 interface BagQuantityButtonInterface {

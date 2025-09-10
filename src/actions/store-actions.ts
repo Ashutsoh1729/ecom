@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import slugify from "slugify";
 import { storeFormSchema } from "@/components/modals/create-store-modal";
 import { db } from "@/db/client";
-import { sellers, stores, users } from "@/db/schema";
+import { sellers, stores } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import z from "zod";
