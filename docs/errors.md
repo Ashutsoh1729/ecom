@@ -1096,3 +1096,71 @@ export const getStoreList = cache(async (): Promise<Store[]> => {
   return stores;
 });
 ```
+
+# Transaction Error
+
+## Query: I thought that if one step fails the whole transaction rolls back, but here that didn't happen, why?? I am inserting but only product gets inserted. Why is that??
+
+It’s inserting only into the product table because the variant, category, and tag insert operations are not awaited and one variable scoping mistake prevents tags from ever being inserted, so the transaction completes without actually executing those later inserts.[1][2][3]
+
+## What’s going wrong
+
+- Missing await on subsequent inserts: tx.insert(productVariants), tx.insert(categories), and tx.insert(tags) are called without await, so the async operations may not run before the transaction scope ends, leading to only the first awaited insert executing reliably.[3][1]
+- Block-scoped shadowing for tags: inside the tags parsing branch, a new const validatedTagsData is declared, which shadows the outer let validatedTagsData; the outer stays undefined, so the later “if (validatedTagsData)” never runs.[4][2]
+- Return/commit expectations: within Drizzle, a transaction function should await all async operations; otherwise, the transaction can commit without the pending async operations being executed or can behave inconsistently depending on the driver.[5][1]
+- Returning and use of inserted id: using .returning() is fine on Postgres; ensure the driver supports it and that the result is awaited as done for currentProduct, then propagate the id to dependent inserts.[6][3]
+
+## How to fix it
+
+- Await every insert inside the transaction:
+  - await tx.insert(productVariants).values(...);[1][3]
+  - await tx.insert(categories).values(...);[3][1]
+  - await tx.insert(tags).values(...);[1][3]
+- Fix tags variable scope:
+  - Replace the inner const validatedTagsData = parsedTagsResult.data with an assignment to the outer variable: validatedTagsData = parsedTagsResult.data.[2][4]
+- Keep error handling/rollback simple:
+  - Throw immediately on validation failure before entering the transaction; once in the transaction, throw on any failure and let Drizzle rollback automatically rather than manually calling tx.rollback().[7][1]
+- Verify driver support:
+  - For Postgres, .returning works; for MySQL it doesn’t and requires insertId; ensure the environment matches expectations.[6][3]
+
+## Minimal corrected snippet
+
+- Change the three inserts to be awaited and fix tags scope.[3][1]
+
+- Tags scope fix:
+
+  - Replace:
+    - const validatedTagsData = parsedTagsResult.data;[2]
+  - With:
+    - validatedTagsData = parsedTagsResult.data;[2]
+
+- Await inserts:
+  - await tx.insert(productVariants).values(finalParsedProductVariantData.data);[1]
+  - await tx.insert(categories).values(finalParsedCategoryData.data);[1]
+  - if (validatedTagsData?.length) await tx.insert(tags).values(validatedTagsData);[1]
+
+## Extra checks
+
+- Ensure partialParsedProductVariantData.data matches productVariantInsertSchema (types/nullable fields), or the safeParse will fail silently and skip the insert path; log parsed success booleans before the transaction to confirm.[8][2]
+- If using a SQLite driver, confirm the transaction callback is awaited properly and that all operations are awaited; some drivers had historical issues when not awaiting.[9][5]
+
+[1](https://orm.drizzle.team/docs/transactions)
+[2](https://github.com/colinhacks/zod)
+[3](https://orm.drizzle.team/docs/insert)
+[4](https://blog.logrocket.com/schema-validation-typescript-zod/)
+[5](https://github.com/drizzle-team/drizzle-orm/issues/2275)
+[6](https://stackoverflow.com/questions/76737007/drizzle-orm-not-support-insert-returning)
+[7](https://github.com/drizzle-team/drizzle-orm/issues/2309)
+[8](https://orm.drizzle.team/docs/zod)
+[9](https://orm.drizzle.team/docs/batch-api)
+[10](https://github.com/drizzle-team/drizzle-orm/issues/1723)
+[11](https://www.answeroverflow.com/m/1141960775091626014)
+[12](https://stackoverflow.com/questions/76813492/typescript-type-error-with-drizzle-orm-and-zod-validation)
+[13](https://github.com/drizzle-team/drizzle-orm/issues/1008)
+[14](https://www.answeroverflow.com/m/1141345642325745814)
+[15](https://stackoverflow.com/questions/71477015/specify-a-zod-schema-with-a-non-optional-but-possibly-undefined-field)
+[16](https://www.answeroverflow.com/m/1177544395306827826)
+[17](https://www.reddit.com/r/PayloadCMS/comments/1lrgx2e/payload_transactions_with_direct_drizzle_queries/)
+[18](https://softwaremill.com/5-reasons-to-choose-drizzle-orm-over-traditional-javascript-orms/)
+[19](https://www.answeroverflow.com/m/1300606438216826960)
+[20](https://www.youtube.com/watch?v=5R2gem0GSmw)

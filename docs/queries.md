@@ -785,3 +785,343 @@ if (existingUser.role === "Seller") {
 ```
 
 This corrected code will now work as you expect, finding the seller record that matches the user's ID and allowing you to add the `sellerId` to your token.
+
+# Query about file structure for writing logic
+
+### Concerns
+
+"use server";
+
+// For creating a new product
+
+const createProduct = async () => {};
+
+// For updating the product
+
+const updateProduct = async () => {};
+
+// For Deleting a Product
+
+const deleteProduct = async () => {};
+
+export { createProduct, updateProduct, deleteProduct };
+
+Here are the actions I am going to declare as the server actions. Should I write the query command in a separate file, or all the actions related to product, I should keep in src/app/actions/product-actions.ts app.
+
+or functions like getUserRole, getStoreList, which I have defined in a logic.ts file under src/lib/ folder. Which only runs on the server components, can be included in the server action files for better file structure.
+
+### Result
+
+This is an excellent question that gets to the heart of building a clean, scalable, and maintainable Next.js application. Your current thinking is already on the right track, and a good structure now will save you a lot of headaches later.
+
+It's a pleasant mid-afternoon here in Rourkela, a perfect time to architect your application's logic.
+
+Let's break down your questions.
+
+---
+
+### 1\. Database Queries: Separate File or Same File?
+
+**Recommendation:** **Separate them.**
+
+This is a classic software design principle called **Separation of Concerns**. Your Server Action file should handle the "business logic," while a separate "data access" file should handle the raw database interactions.
+
+- **Your Server Action (`src/app/actions/product-actions.ts`):** This file's job is to be the entry point from the client. It should handle:
+
+  - Validating user input (e.g., using Zod).
+  - Checking user permissions/authentication (`await auth()`).
+  - Calling the data access functions.
+  - Handling errors and returning a meaningful response.
+  - Calling `revalidatePath` or `revalidateTag` to update the cache.
+
+- **Your Data Access Layer (e.g., `src/lib/data/products.ts`):** This file's job is to talk to the database. It will contain functions that perform the actual Drizzle queries.
+
+**Why is this better?**
+
+- **Reusability:** You might need to get a product's details in both the `updateProduct` Server Action _and_ on a Server Component for a product detail page. You can write the `getProductById` query once in your data access file and call it from both places.
+- **Testability:** It's much easier to test a pure data-fetching function than it is to test a full Server Action with all its side effects.
+- **Readability:** It makes your code cleaner. The action file reads like a story of what's happening, without getting bogged down in the details of the database query.
+
+**Example:**
+
+```typescript
+// src/lib/data/products.ts
+// This file ONLY talks to the database for products.
+import { db } from "@/lib/db";
+import { products } from "@/lib/schema";
+import { eq } from "drizzle-orm";
+
+export async function getProductById(productId: number) {
+  return await db.query.products.findFirst({
+    where: eq(products.id, productId),
+  });
+}
+
+export async function createNewProduct(data: NewProductData) {
+  // ... Drizzle insert logic
+}
+```
+
+```typescript
+// src/app/actions/product-actions.ts
+"use server";
+
+import { revalidatePath } from 'next/cache';
+import { auth } from '@/auth';
+import { createNewProduct, getProductById } from '@/lib/data/products'; // <-- Import from data layer
+
+export async function createProduct(formData: FormData) {
+  const session = await auth();
+  if (!session?.user?.sellerId) {
+    return { error: "Not authorized" };
+  }
+
+  // 1. Validate form data...
+  // 2. Call the data access function
+  await createNewProduct({ ... });
+
+  // 3. Revalidate cache
+  revalidatePath('/dashboard/products');
+
+  return { success: "Product created!" };
+}
+```
+
+---
+
+### 2\. `getUserRole`, `getStoreList`: Where do they belong?
+
+**Recommendation:** **Keep them separate from your Server Action files.**
+
+You have correctly identified a crucial distinction.
+
+- **Server Actions (`"use server"` files):** Think of these as your application's **"write" operations** or **verbs**. They are designed to be called from the client to _mutate_ data (Create, Update, Delete). The `"use server"` directive essentially creates an RPC endpoint for client components to call.
+
+- **Data Fetching Functions (`getStoreList`):** Think of these as your application's **"read" operations** or **getters**. They are designed to be called by other **server-side** code (like Server Components or other Server Actions). They are not meant to be directly exposed as endpoints for the client.
+
+Mixing them in the same file can be confusing. The purpose of a `product-actions.ts` file is to define client-callable _actions_. The purpose of `getStoreList` is to provide data to the server.
+
+Your current location, `src/lib/logic.ts`, is perfectly fine. A common and even more scalable pattern is to organize these data-fetching functions by their domain, just like we did for the product queries.
+
+---
+
+### Recommended File Structure
+
+Based on this, here is a highly recommended and scalable structure for your server-side logic:
+
+```
+src/
+├── app/
+│   ├── (seller)/dashboard/stores/
+│   │   └── page.tsx      // <-- Calls getStoreList()
+│   ├── actions/
+│   │   ├── product-actions.ts  // (createProduct, updateProduct, deleteProduct)
+│   │   └── order-actions.ts    // (placeOrder)
+│   └── ...
+│
+├── lib/
+│   ├── db.ts               // Drizzle client setup
+│   ├── schema.ts           // Drizzle schema definitions
+│   ├── data/
+│   │   ├── stores.ts       // Contains getStoreList(), getStoreById()
+│   │   ├── users.ts        // Contains getUserRole(), getUserById()
+│   │   └── products.ts     // Contains getProductById(), getAllProducts()
+│   └── ...
+│
+└── auth.ts                 // Your main NextAuth configuration
+```
+
+**Summary of this structure:**
+
+- **`src/app/actions/`:** Contains only client-callable Server Actions that mutate data.
+- **`src/lib/data/`:** Contains all your server-only data-fetching logic, neatly organized by what kind of data it handles.
+- **Components and Actions:** Server Components and Server Actions in `src/app` will import their data-fetching logic from `src/lib/data/`.
+
+Taking a moment on this Wednesday afternoon to set up this structure will pay huge dividends, making your codebase clean, reusable, and a pleasure to work in as your project grows.
+
+# how should we take color values and store it in database?
+
+Excellent question. How you handle color values is crucial for both user experience on the front-end and data integrity on the back-end.
+
+The best practice is a two-part approach:
+
+1.  **On the Front-end (UI):** Provide a user-friendly, controlled way for users to select a color, like pre-defined swatches.
+2.  **On the Back-end (Database):** Store the color in a precise, standardized format—the **HEX code** is the industry standard. It's also wise to store the human-friendly name.
+
+Let's break this down in detail.
+
+---
+
+### Part 1: How to Take Color Values from the User (The UI)
+
+You should avoid letting users type a color name freely in a text box. This leads to inconsistent data like "Red", "red", "Crimson", "Garnet", etc., which is impossible to manage.
+
+#### Option A: Color Swatches (Highly Recommended for E-commerce)
+
+This is the most common and effective method. You present the user with a set of clickable colored circles or squares.
+
+- **How it works:** Each swatch is visually rendered using its HEX code, but it also has a human-friendly name associated with it (e.g., a `<span>` or a tooltip). When the user clicks a swatch, you send its associated value to the backend.
+- **Why it's great:**
+  - **Controlled Inventory:** You limit choices to colors you actually sell.
+  - **Consistency:** The data is always consistent. "Midnight Blue" is always `"#003366"`.
+  - **Good UX:** It's visual, intuitive, and fast for the user.
+
+**Example Implementation:**
+In your front-end code (e.g., React), your data for the swatches might look like this:
+
+```javascript
+const availableColors = [
+  { name: "Classic Black", hex: "#000000" },
+  { name: "Snow White", hex: "#FFFFFF" },
+  { name: "Forest Green", hex: "#228B22" },
+  { name: "Crimson Red", hex: "#DC143C" },
+];
+
+// When the user clicks "Forest Green", you send this object to the backend:
+// { name: 'Forest Green', hex: '#228B22' }
+```
+
+#### Option B: Color Picker
+
+This is a tool that allows users to select any color from a spectrum.
+
+- **When to use it:** Best for highly customizable products where the user can pick any color imaginable (e.g., custom car paint, print-on-demand items, design tools).
+- **Downside:** Not suitable for standard products with fixed color variants, as it gives you no control over inventory. The user would always submit a HEX code from the picker.
+
+---
+
+### Part 2: How to Store Color Values in the Database
+
+You have two main strategies for the database schema, but in both cases, storing the HEX code is key.
+
+#### Method 1: The Simple & Direct Approach (Recommended for most cases)
+
+In your `product_variants` table, store both the color's name and its HEX code in separate columns.
+
+- `color_name` (e.g., `VARCHAR(50)`): Stores the human-readable name like "Forest Green". This is crucial for display, invoices, and accessibility (screen readers).
+- `color_hex` (e.g., `VARCHAR(7)`): Stores the unambiguous HEX code like `"#228B22"`. This is used to render the color swatch in the UI. The length is 7 to include the `#` symbol.
+
+**Example Table Schema (SQL):**
+
+```sql
+CREATE TABLE product_variants (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    product_id INT,
+    sku VARCHAR(100) UNIQUE NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    stock INT NOT NULL,
+    size VARCHAR(50),
+    -- Color Information --
+    color_name VARCHAR(50),
+    color_hex VARCHAR(7),
+    -- Foreign Key to products table --
+    FOREIGN KEY (product_id) REFERENCES products(id),
+    -- Ensure a variant is unique for a product by size and color --
+    UNIQUE (product_id, size, color_name)
+);
+```
+
+**Why is HEX the best format to store?**
+
+- **Universal Standard:** All browsers, design tools, and front-end frameworks understand HEX codes natively.
+- **Precise:** It represents a single, exact color, unlike a name.
+- **Compact:** It's a short, fixed-length string.
+- **Directly Usable:** You can take the value directly from the database and use it in CSS: `style="background-color: ${variant.color_hex};"`.
+
+#### Method 2: The Normalized Approach (For advanced use-cases)
+
+If you have a limited, site-wide palette of colors that you want to manage centrally, you can create a separate `colors` table.
+
+**When to use this:** When you want to be able to, for example, update the HEX code for "Summer Red" in one place and have it reflect across all products that use that color.
+
+**Example Schema:**
+
+1.  **`colors` table:**
+
+    ```sql
+    CREATE TABLE colors (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        name VARCHAR(50) UNIQUE NOT NULL, -- "Forest Green"
+        hex_code VARCHAR(7) NOT NULL      -- "#228B22"
+    );
+    ```
+
+2.  **`product_variants` table:**
+    You would then replace the `color_name` and `color_hex` columns with a foreign key to this new table.
+
+    ```sql
+    CREATE TABLE product_variants (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        product_id INT,
+        sku VARCHAR(100) UNIQUE NOT NULL,
+        -- ... other columns like price, stock ...
+        color_id INT, -- Foreign key to the colors table
+        FOREIGN KEY (color_id) REFERENCES colors(id)
+    );
+    ```
+
+<!-- end list -->
+
+- **Pro:** Enforces strict data consistency. No chance of typos in color names. Central management of your color palette.
+- **Con:** Requires an extra `JOIN` in your SQL queries to retrieve the color name and hex code, which adds a tiny bit of complexity.
+
+### Final Recommendation
+
+For most e-commerce applications, **Method 1 (The Simple & Direct Approach)** is perfect.
+
+1.  **UI:** Use **Color Swatches**.
+2.  **Database:** In your `product_variants` table, create two columns:
+    - `color_name` (e.g., "Charcoal Grey")
+    - `color_hex` (e.g., `"#36454F"`)
+
+# Can you do multiple data insert to multiple tables in one insert function in drizzle and neon db
+
+## response 1:
+
+Can you do multiple data insert to multiple tables in one insert function in drizzle and neon db
+
+# How to store images?
+
+## response:
+
+Short answer: Don’t store binary image files in relational tables; store the files in object storage or a media service and keep only the URL/metadata in SQL. The most common, scalable approach is cloud object storage + a CDN, or a media optimization CDN that handles storage, transformations, and delivery.
+
+## Core options
+
+- Object storage + CDN: Store originals in a bucket (e.g., S3, GCS, Azure Blob) and serve via a global CDN (e.g., CloudFront, Cloud CDN, Azure CDN) for fast delivery and caching at the edge. Only persist image URLs, dimensions, and alt text in SQL. This is widely regarded as best practice for web apps and ecommerce.[4]
+- Media optimization CDN: Use services that store or pull from your bucket and then deliver optimized variants on-the-fly (WebP/AVIF, resizing, compression) via URL parameters. This reduces devops overhead and speeds up pages while keeping SQL clean with just URLs and metadata.[5]
+- Traditional hosting on app server: Possible but not recommended for ecommerce scale—ties media to app lifecycle, increases downtime risk, and degrades performance for geographically distributed traffic.[4]
+
+## Recommended architecture
+
+- Upload flow: Client uploads to storage directly (pre-signed URL) to avoid routing large files through the app server. The app gets back the object key/URL and stores it in SQL along with product_id, alt text, focal point, etc.[4]
+- Delivery: Serve through CDN with cache-control headers; use responsive images (srcset, sizes) and modern formats (WebP/AVIF) to cut weight while keeping quality. If using a media CDN, generate size/format variants at the edge by URL.[10]
+- Management: Use logical foldering and standardized metadata; consider a DAM-like workflow if teams and volumes grow (versioning, permissions, transformations).[5]
+
+## Practical choices for an ecommerce stack
+
+- Lowest ops, fastest to good results: Media optimization CDN (e.g., ImageKit/Cloudinary-like pattern) in front of object storage; store canonical image URL in SQL, and render size-specific variants by URL params. This gives dynamic resizing, WebP/AVIF, lazy transforms, and caching.[5]
+- Cost-optimized and flexible: Pure object storage + CDN, plus a build- or request-time image transformer (Next.js Image Optimization, self-hosted thumbor/sharp service). Keep control over infra, but more setup.[4]
+
+## Implementation notes
+
+- Database schema: products_images table with fields such as product_id, url, alt, width, height, role (primary/detail/zoom), sort_order; avoid blobs in SQL to keep DB lean and backups small.[4]
+- Optimization basics: Provide multiple responsive sizes via srcset; use modern formats; compress images before upload or at the edge; aim for the smallest file that preserves perceived quality. This directly impacts conversion and SEO.[2][6][10]
+- SEO and UX: Supply descriptive alt text, structured data images, and multiple aspect ratios when relevant; follow Google’s image best practices to boost visibility in image search and product results.[7][10]
+
+## When a DAM makes sense
+
+- If many contributors, many channels, or strict brand control are involved, consider a DAM or media platform that centralizes assets, permissions, versions, and automated transformations, then distribute via CDN. This reduces errors and speeds change management.[5]
+
+If helpful, a concrete Next.js pattern can be shared for direct-to-storage uploads (pre-signed URL), storing the returned object key in SQL, and rendering through an optimizer/CDN with srcset and WebP fallbacks.[10][4]
+
+[1](https://www.mgt-commerce.com/blog/image-hosting-for-ecommerce/)
+[2](https://www.mediavalet.com/blog/7-best-practices-for-your-ecommerce-images)
+[3](https://thegood.com/insights/product-image-conversions/)
+[4](https://stackoverflow.com/questions/67976645/where-media-files-images-etc-should-be-stored-for-a-websites)
+[5](https://imagekit.io/blog/ecommerce-image-management/)
+[6](https://www.zoho.com/academy/e-commerce/product-photography/optimizing-product-images.html)
+[7](https://www.reddit.com/r/TechSEO/comments/xb8xua/image_optimization_best_practices_for_ecommerce/)
+[8](https://cxl.com/ecommerce-best-practices/images/)
+[9](https://bluegiftdigital.com/how-to-store-images-for-ecommerce-website/)
+[10](https://developers.google.com/search/docs/appearance/google-images)

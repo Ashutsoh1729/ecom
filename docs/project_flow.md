@@ -8,13 +8,20 @@ Here i will mention my current state of the project and what are the features i 
 4. Adding shopping-bag-page, account page with all of their components ( Currently making the ui part, will add the functionality later )
 5. Upgrading the role from "Buyer" to "Seller", added zod for validating data
 6. Protecting pages like dashboard based on role
+7. Sidebar, store route, products route
 
 # Currently Working
 
 1. Making the dashboard
-   a. Sidebar, store route, products route, variants route,
-   b. Adding products, we will use modals to add products
+   a. Adding products, we will use modals to add products
 
 # Planning
 
-1. Search bar, searching functionality using tags of the products
+1. Creating a modal to add product, it will be devided into 3 parts
+   a. taking product info
+   b. taking it's variants value
+   c. taking the category and tags value
+2. Creating a indivisual product viewing page
+3. Product table
+
+4. Search bar, searching functionality using tags of the products

@@ -9,13 +9,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { StoreTableDataInterface } from "@/lib/logic";
+import { useStoreList } from "../../(root)/context/store-context";
 
-const StoreTable = ({
-  storeDataList,
-}: {
-  storeDataList: StoreTableDataInterface[];
-}) => {
+const StoreTable = () => {
+  const storesList = useStoreList();
+
+  if (storesList === null) {
+    return;
+  }
+
   return (
     <div>
       <Table>
@@ -27,7 +29,7 @@ const StoreTable = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {storeDataList.map((item, index) => {
+          {storesList.map((item, index) => {
             return (
               <TableRow key={index}>
                 <TableCell className="font-medium">{item.storeName}</TableCell>

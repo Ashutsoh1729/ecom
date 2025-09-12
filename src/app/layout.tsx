@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter, Alkatra } from "next/font/google";
 import "./globals.css";
-import ModalManager from "@/components/page-sections/modal-manager";
 import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
@@ -41,7 +40,6 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${fontAlkatra.variable} ${interSans.variable} antialiased`}
       >
-        <ModalManager />
         <Toaster />
         <main>{children}</main>
       </body>
