@@ -9,6 +9,7 @@ import {
   AnyPgColumn,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "@auth/core/adapters";
+import { relations } from "drizzle-orm";
 
 // -- Enum Declaration --
 
@@ -127,6 +128,14 @@ export const sellers = pgTable("sellers", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// TODO: Defining the relation between the seller and store, so that drizzle query can work
+
+export const sellerRelations = relations(sellers, ({ many }) => {
+  return {
+    stores: many(stores),
+  };
+});
+
 export const stores = pgTable("stores", {
   id: text("id")
     .primaryKey()
@@ -151,6 +160,17 @@ export const stores = pgTable("stores", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// NOTE: while linking i have link the relation on both sides
+
+export const storeRelations = relations(stores, ({ many, one }) => {
+  return {
+    products: many(products),
+    seller: one(sellers, {
+      fields: [stores.sellerId],
+      references: [sellers.id],
+    }),
+  };
+});
 export const productStatus = pgEnum("product_status", [
   "draft",
   "active",
@@ -167,6 +187,7 @@ export const products = pgTable("products", {
     .references(() => stores.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   description: text("description"),
+  slug: text("slug").notNull().unique(),
 
   status: productStatus("status").default("draft").notNull(),
 
@@ -174,6 +195,22 @@ export const products = pgTable("products", {
 
   createdAt: timestamp("cretaed_at").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+});
+
+// -- defining relations
+export const productsRelations = relations(products, ({ many, one }) => {
+  return {
+    variants: many(productVariants),
+    store: one(stores, {
+      fields: [products.storeId],
+      references: [stores.id],
+    }),
+    // Many-to-many: For linking products to categories
+    productsToCategories: many(productsToCategories),
+
+    // Many-to-many: For linking products to tags
+    productToTags: many(productToTags),
+  };
 });
 
 export const productVariants = pgTable("product_variants", {
@@ -197,6 +234,23 @@ export const productVariants = pgTable("product_variants", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// relations
+// NOTE: Here i had made an error, of not correctly linkging the one - many relations
+// 1. one side realtions are always need a configuration object to know how to link
+// 2. Array is used to give the column list one one column
+
+export const productVariantsRelations = relations(
+  productVariants,
+  ({ one }) => {
+    return {
+      product: one(products, {
+        fields: [productVariants.productId],
+        references: [products.id],
+      }),
+    };
+  },
+);
+
 // -- Category Table --
 
 export const categories = pgTable("categories", {
@@ -216,6 +270,24 @@ export const categories = pgTable("categories", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// creating the relations for categories
+
+// -- Category & Tag Relations (with M-M and self-referencing) --
+
+export const categoriesRelations = relations(categories, ({ one, many }) => ({
+  // Self-referencing: for parent category
+  parentCategory: one(categories, {
+    fields: [categories.parentId],
+    references: [categories.id],
+  }),
+
+  // Self-referencing: for sub-categories
+  subCategories: many(categories, { relationName: "subCategories" }),
+
+  // Many-to-many: For linking categories to products
+  productsToCategories: many(productsToCategories),
+}));
+
 export const tags = pgTable("tags", {
   id: text("id")
     .notNull()
@@ -228,6 +300,13 @@ export const tags = pgTable("tags", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+// creating the relations for tags
+
+export const tagsRelations = relations(tags, ({ many }) => ({
+  // Many-to-many: For linking tags to products
+  productToTags: many(productToTags),
+}));
 
 // -- join table --
 //
@@ -261,3 +340,30 @@ export const productsToCategories = pgTable(
   // It is called composite primary key
   (t) => [primaryKey({ columns: [t.productId, t.categoryId] })],
 );
+
+// NOTE: Cretaing the relations for joint tables. I have to understand this concept more.
+
+export const productsToCategoriesRelations = relations(
+  productsToCategories,
+  ({ one }) => ({
+    product: one(products, {
+      fields: [productsToCategories.productId],
+      references: [products.id],
+    }),
+    category: one(categories, {
+      fields: [productsToCategories.categoryId],
+      references: [categories.id],
+    }),
+  }),
+);
+
+export const productToTagsRelations = relations(productToTags, ({ one }) => ({
+  product: one(products, {
+    fields: [productToTags.productId],
+    references: [products.id],
+  }),
+  tag: one(tags, {
+    fields: [productToTags.tagId],
+    references: [tags.id],
+  }),
+}));

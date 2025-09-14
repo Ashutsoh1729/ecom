@@ -60,9 +60,6 @@ const CreateStoreModal = () => {
     // This function will eventually send the 'data' object to a server action or API route.
     try {
       console.log("Form data to be sent to backend:", data);
-      toast.success("Store created successfully!", {
-        description: "Your new store is now ready for setup.",
-      });
       // In a real implementation, you would trigger a server action or API call here
       // For example:
       await createNewStore(data);
@@ -74,6 +71,9 @@ const CreateStoreModal = () => {
       //      body: JSON.stringify(data),
       //    });
 
+      toast.success("Store created successfully!", {
+        description: "Your new store is now ready for setup.",
+      });
       closeModal(); // Close the modal on successful submission
       router.refresh();
     } catch (error) {

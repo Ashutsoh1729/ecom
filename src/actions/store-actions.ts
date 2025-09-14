@@ -63,3 +63,11 @@ export default async function createNewStore(
     console.error("Some error has happened at the server end", err);
   }
 }
+
+export async function deleteStore(storeId: string) {
+  if (!storeId) {
+    console.error("Store id is required to delete a store");
+    throw new Error("Store id is required for deleting a store");
+  }
+  await db.delete(stores).where(eq(stores.id, storeId));
+}

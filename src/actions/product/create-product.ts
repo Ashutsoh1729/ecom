@@ -1,10 +1,8 @@
 "use server";
 
-import {
-  Out,
-  variantsFormSchema,
-} from "@/components/modals/create-product-modal";
+import { Out } from "@/components/modals/create-product-modal";
 import { db } from "@/db/client";
+import { generateProductSlug } from "@/db/logic";
 import { categories, products, productVariants, tags } from "@/db/schema";
 import { createInsertSchema } from "drizzle-zod";
 import { nanoid } from "nanoid";
@@ -51,6 +49,7 @@ const createProduct = async (data: Out) => {
       description: data.description,
       status: data.status,
       storeId: data.storeId,
+      slug: generateProductSlug(data.name),
     };
 
     const partialProductVariantData = data.variants.map((item) => {
@@ -182,12 +181,4 @@ const createProduct = async (data: Out) => {
   }
 };
 
-// For updating the product
-
-const updateProduct = async () => {};
-
-// For Deleting a Product
-
-const deleteProduct = async () => {};
-
-export { createProduct, updateProduct, deleteProduct };
+export default createProduct;

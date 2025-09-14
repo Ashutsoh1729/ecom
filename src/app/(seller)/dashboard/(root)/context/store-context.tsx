@@ -1,17 +1,26 @@
 "use client";
 
+import {
+  getSellerStoreAllDataOutputInterface,
+  productDataInterface,
+} from "@/lib/data/products";
 import { StoreTableDataInterface } from "@/lib/logic";
 import { createContext, ReactNode, useContext } from "react";
 
 // It is going to use provide context to the children components of a layout file
+// TODO: I will combine this storeList and productList and will give all the data from one place, in one go
 
 export type storesList = StoreTableDataInterface[];
+export type productList = productDataInterface[];
+export type allDataListType = getSellerStoreAllDataOutputInterface[];
 
 // 1. Create the Context with a default value
 // The default value is used when a component tries to access the context
 // without a matching provider higher up in the tree.
 
 const StoreContext = createContext<storesList | null>(null);
+const ProductContext = createContext<productList | null>(null);
+const AllStoresDataContext = createContext<allDataListType | null>(null);
 
 // 2. Create a Provider Component
 // This component will wrap parts of your app and make the user data
@@ -22,9 +31,36 @@ interface StoreProviderProps {
   value: storesList | null; // The data you want to provide
 }
 
+interface ProductProviderProps {
+  children: ReactNode;
+  value: productList | null;
+}
+
+interface AllStoresDataProviderProps {
+  children: ReactNode;
+  value: allDataListType | null;
+}
+
 export function StoreProvider({ children, value }: StoreProviderProps) {
   return (
     <StoreContext.Provider value={value}>{children}</StoreContext.Provider>
+  );
+}
+
+export function ProductProvider({ children, value }: ProductProviderProps) {
+  return (
+    <ProductContext.Provider value={value}>{children}</ProductContext.Provider>
+  );
+}
+
+export function AllStoreDataProvider({
+  children,
+  value,
+}: AllStoresDataProviderProps) {
+  return (
+    <AllStoresDataContext.Provider value={value}>
+      {children}
+    </AllStoresDataContext.Provider>
   );
 }
 
@@ -40,5 +76,21 @@ export function useStoreList() {
   // The context can be null if the user is not logged in.
   // Your components should handle this case.
 
+  return context;
+}
+
+export function useProductList() {
+  const context = useContext(ProductContext);
+  if (context === undefined) {
+    throw new Error("useProductList must be inside of a ProductProvider");
+  }
+  return context;
+}
+
+export function useAllStoresDataList() {
+  const context = useContext(AllStoresDataContext);
+  if (context === undefined) {
+    throw new Error("useAllStoresData context must be inside of Provider");
+  }
   return context;
 }

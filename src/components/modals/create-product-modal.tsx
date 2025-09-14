@@ -36,7 +36,8 @@ import { Plus, TrashIcon } from "lucide-react";
 import { useState } from "react";
 import { useModalStore } from "@/util/states/modal";
 
-import { createProduct } from "@/actions/product-actions";
+import { createProduct } from "@/actions/product/product-actions";
+import { toast } from "sonner";
 
 export const availableColors = [
   { name: "Classic Black", hex: "#000000" },
@@ -537,8 +538,13 @@ const CreateProductModal = () => {
     // console.log(step);
     // NOTE: It is working only when the step 3 has atleast one none-optional point
     await createProduct(data);
-    console.log("The onSubmit button is clicked");
-    console.log(form.formState);
+    /*     console.log("The onSubmit button is clicked");
+    console.log(form.formState); */
+
+    toast.success("Product created successfully!", {
+      description: "Your new Product is now ready for Sales.",
+    });
+
     handleClose();
   };
 

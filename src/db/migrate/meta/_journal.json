@@ -36,6 +36,20 @@
       "when": 1757441477814,
       "tag": "0004_panoramic_nemesis",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1757732548244,
+      "tag": "0005_ordinary_blizzard",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1757733339319,
+      "tag": "0006_mushy_tomas",
+      "breakpoints": true
     }
   ]
 }

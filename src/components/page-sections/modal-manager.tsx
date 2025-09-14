@@ -52,7 +52,7 @@ const ModalManager = () => {
         </div>
         {/* ... close button ... */}
         <Separator />
-        <div className="px-6 pt-3">
+        <div className="px-6 pt-3 pb-4">
           <ActiveModalComponent />
         </div>
       </div>

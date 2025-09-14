@@ -1,22 +1,37 @@
-/* // Instead of dotenv i am using direnv for development phase
+/* // Populating the slug values
 
+import { eq, isNull } from "drizzle-orm";
 import { db } from "../client";
-// import dotenv from "dotenv";
-import { userTable } from "../schema";
+import { products } from "../schema";
+import { generateProductSlug } from "../logic";
 
-// dotenv.config({ path: ".env.local" });
+async function backfillSlug() {
+  console.log("Starting backfill for product slugs...");
 
-async function main() {
-  const user: typeof userTable.$inferInsert = {
-    name: "Rhon",
-    age: 21,
-    email: "rhon@email.com",
-  };
+  // finding all the products to update
+  const productsToUpdate = await db
+    .select()
+    .from(products)
+    .where(isNull(products.slug));
 
-  // inserting into the db
+  // handling the case where every product has a slug value
+  if (productsToUpdate.length === 0) {
+    console.log("No products need a slug. All done!");
+    return;
+  }
+  console.log(`Found ${productsToUpdate.length} products to update.`);
 
-  await db.insert(userTable).values(user);
-  console.log("New user is created.");
+  await db.transaction(async (tx) => {
+    for (const product of productsToUpdate) {
+      const newSlug = generateProductSlug(product.name);
+      await tx
+        .update(products)
+        .set({ slug: newSlug })
+        .where(eq(products.id, product.id));
+    }
+  });
+
+  console.log("Backfill complete!");
 }
 
-main(); */
+backfillSlug().catch(console.error); */
