@@ -47,7 +47,7 @@ const AddressModal = () => {
       country: "India",
       postalCode: "",
       phoneNumber: "",
-      addressType: null, // default is set to home
+      addressType: "Home", // default is set to home
       otherAddressType: "",
     },
   });
@@ -183,7 +183,7 @@ const AddressModal = () => {
                   </FormItem>
                 )}
               />
-              <div className="flex items-start  justify-between">
+              <div className="flexitems-start  justify-between">
                 {/* Country */}
                 <FormField
                   control={form.control}

@@ -27,8 +27,7 @@ export const addressFormSchema = z
         message: "Address Lane 2 cannot be more than 100 characters.",
       })
       // 3. Handle optional fields that could be empty strings
-      .optional()
-      .nullable(),
+      .optional(),
 
     landmark: z
       .string()
@@ -36,8 +35,7 @@ export const addressFormSchema = z
       .max(100, {
         message: "Address Lane 2 cannot be more than 100 characters.",
       })
-      .optional()
-      .nullable(),
+      .optional(),
     // 3. Handle optional fields that could be empty strings
     city: z.string().trim().nonempty({ message: "City is required." }),
     state: z.string().trim().nonempty({ message: "City is required." }),
@@ -56,11 +54,12 @@ export const addressFormSchema = z
     // NEW: The addressType field
     // .nullable() allows the value to be `null`.
     // .optional() allows the key to be missing entirely (`undefined`).
-    addressType: AddressTypeEnum.nullable().optional(),
+    //  NOTE: Removed the nullable, change if any problem aries
+    addressType: AddressTypeEnum.optional(),
 
     // NEW: The field for custom input when 'Other' is selected.
     // This is optional by default. We will make it required conditionally.
-    otherAddressType: z.string().trim().optional().nullable(),
+    otherAddressType: z.string().trim().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.addressType === "Other") {
