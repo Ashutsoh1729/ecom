@@ -1,0 +1,1 @@
+ALTER TABLE "products" RENAME COLUMN "updatedAt" TO "updated_at";

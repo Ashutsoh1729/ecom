@@ -11,7 +11,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import AvatarIcon from "@/components/util/avatar-icon";
+import AvatarIcon from "@/app/components/avatar-icon";
 import { useSession } from "next-auth/react";
 
 // Menu items.

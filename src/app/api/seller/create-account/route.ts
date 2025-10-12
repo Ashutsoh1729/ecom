@@ -1,4 +1,4 @@
-import { createNewSellerAccount } from "@/actions/create-seller";
+import { createNewSellerAccount } from "@/actions/(seller)/create-seller";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {

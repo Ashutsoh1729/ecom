@@ -1,17 +1,22 @@
 "use client";
 
 import { signOut } from "next-auth/react";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "../../components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+} from "../../components/ui/dropdown-menu";
 import { User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useModalStore } from "@/util/states/modal";
+import { useEffect, useState } from "react";
 
 interface AvatarIconInterface {
   img?: string;
@@ -30,6 +35,17 @@ const AvatarIcon = ({ img, role = "Buyer" }: AvatarIconInterface) => {
       router.push("/");
     }
   };
+
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Don't render anything on the server or during the initial client render
+  if (!isMounted) {
+    return null; // Or return a placeholder/skeleton
+  }
 
   return (
     <>
@@ -51,15 +67,15 @@ const AvatarIcon = ({ img, role = "Buyer" }: AvatarIconInterface) => {
             Account
           </DropdownMenuItem>
 
-          {/* {role === "Buyer" && ( */}
-          <DropdownMenuItem
-            onClick={() => {
-              router.push("/dashboard");
-            }}
-          >
-            Dashboard
-          </DropdownMenuItem>
-          {/* )} */}
+          {role === "Seller" && (
+            <DropdownMenuItem
+              onClick={() => {
+                router.push("/dashboard");
+              }}
+            >
+              Dashboard
+            </DropdownMenuItem>
+          )}
 
           {role === "Buyer" && (
             <DropdownMenuItem
@@ -83,6 +99,7 @@ const AvatarIcon = ({ img, role = "Buyer" }: AvatarIconInterface) => {
 
           <DropdownMenuSeparator />
           <DropdownMenuItem
+            variant="destructive"
             onClick={() => {
               signOut();
             }}

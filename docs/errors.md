@@ -1268,3 +1268,9 @@ export const StoreColumns = (
 ```
 
 While this works, the `as const` method is generally preferred for its conciseness and for being a more direct way of telling TypeScript your intent.
+
+# Unresolved Problems
+
+1. Product form getting subbmited without hitting the submit button. Only when both category and tags are optional. But it shouldn't be like that.
+
+2. Tailwindcss errors. Some of the classes are not getting applied, while they should.

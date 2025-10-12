@@ -28,6 +28,17 @@ export const users = pgTable("user", {
   role: userRole("role").default("Buyer").notNull(),
 });
 
+export const usersRelations = relations(users, ({ one, many }) => {
+  return {
+    address: many(addresses),
+
+    // A user can have ONE seller profile. This is the "has-one" side.
+    // Drizzle infers the relationship from the foreign key on the 'sellers' table.
+    // You don't need to specify fields/references here.
+    seller: one(sellers),
+  };
+});
+
 export const accounts = pgTable(
   "account",
   {
@@ -128,11 +139,17 @@ export const sellers = pgTable("sellers", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-// TODO: Defining the relation between the seller and store, so that drizzle query can work
-
-export const sellerRelations = relations(sellers, ({ many }) => {
+export const sellerRelations = relations(sellers, ({ many, one }) => {
   return {
     stores: many(stores),
+
+    // A seller profile belongs to ONE user. This is the "belongs-to" side.
+    // We explicitly define the relationship here.
+
+    users: one(users, {
+      fields: [sellers.userId],
+      references: [users.id],
+    }),
   };
 });
 
@@ -146,7 +163,7 @@ export const stores = pgTable("stores", {
 
   // -- store specification details --
 
-  storeName: text("store_name").notNull(),
+  storeName: text("store_name").notNull().unique(),
   storeDescription: text("store_desctiption"),
   slug: text("slug").unique().notNull(),
   logoImage: text("logo_image"),
@@ -185,16 +202,19 @@ export const products = pgTable("products", {
   storeId: text("store_id")
     .notNull()
     .references(() => stores.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
+  name: text("name").notNull().unique(),
   description: text("description"),
   slug: text("slug").notNull().unique(),
+
+  // store image url here
+  mainImageUrl: text("main_img").notNull().unique(),
 
   status: productStatus("status").default("draft").notNull(),
 
   // timestamps
 
   createdAt: timestamp("cretaed_at").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 // -- defining relations
@@ -307,6 +327,45 @@ export const tagsRelations = relations(tags, ({ many }) => ({
   // Many-to-many: For linking tags to products
   productToTags: many(productToTags),
 }));
+
+export const AddressType = pgEnum("address_type", ["Home", "Work", "Other"]);
+export const AddressCountry = pgEnum("address_country", [
+  "India",
+  "United States",
+]);
+
+export const addresses = pgTable("addresses", {
+  id: text("id")
+    .notNull()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text("userId")
+    .notNull()
+    .references((): AnyPgColumn => users.id, {
+      onDelete: "cascade",
+    }),
+  recipientName: text("recipient_name").notNull(),
+  lane1: text("lane1").notNull(),
+  lane2: text("lane2"),
+  landmark: text("landmark"),
+  city: text("city").notNull(),
+  state: text("state").notNull(),
+  postalCode: text("postal_code").notNull(),
+  country: AddressCountry("country").notNull(),
+  addressType: AddressType("address_type").notNull(),
+  otherAddressType: text("other_address_type"),
+});
+
+// relation for addrss
+
+export const addressRelations = relations(addresses, ({ one }) => {
+  return {
+    users: one(users, {
+      fields: [addresses.userId],
+      references: [users.id],
+    }),
+  };
+});
 
 // -- join table --
 //

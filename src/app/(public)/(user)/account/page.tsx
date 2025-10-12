@@ -1,11 +1,14 @@
 import { auth } from "@/auth";
-import AddressCard from "@/app/(public)/(user)/account/components/address-card";
+import AddressCard, {
+  Address_2,
+} from "@/app/(public)/(user)/account/components/address-card";
 import OrderAccountProductCard from "@/app/(public)/(user)/account/components/order-product-card";
 import SecurityItem from "@/app/(public)/(user)/account/components/security-item";
 import SectionHeader from "@/components/page-sections/section-header";
 import { AccountProductList, AddressList } from "@/util/data";
 import { User } from "lucide-react";
 import Image from "next/image";
+import { getUserAddress } from "@/lib/data/users";
 
 const AccountPage = async () => {
   const session = await auth();
@@ -13,6 +16,11 @@ const AccountPage = async () => {
   const img = session?.user?.image;
   const name = session?.user?.name;
   const email = session?.user?.email;
+  const userAddrsses = await getUserAddress();
+
+  // console.log(userAddrsses);
+
+  // TODO: Make the page responsive. Start by building for mobile screen and then move towards for building the desktop.
 
   const securityNameList = ["Password", "Passkeys", "2 Step Verification"];
   return (
@@ -24,15 +32,18 @@ const AccountPage = async () => {
             id="account-section-container"
             className="flex h-fit w-full justify-between"
           >
-            <div className="flex items-end w-full" id="account-section-c1">
-              <div className="rounded-md inline-flex overflow-hidden ">
+            <div
+              className=" w-full grid-rows-5 grid-cols-1 grid  lg:grid-cols-2"
+              id="account-section-c1"
+            >
+              <div className="rounded-md  overflow-hidden row-span-3  lg:col-span-1  ">
                 {img ? (
                   <Image src={img} alt="" width={180} height={180} />
                 ) : (
                   <User size={180} strokeWidth={1} />
                 )}
               </div>
-              <div className="pl-4">
+              <div className="pt-3lg:pl-4 row-span-2 lg:col-span-1 ">
                 <span className="text-3xl font-bold">{name}</span>
                 <div>
                   <span className="text-[14px] text-slate-600 font-medium">
@@ -48,7 +59,10 @@ const AccountPage = async () => {
               id="account-section-c2"
             >
               <div>Security</div>
-              <div id="security-elements" className="grid grid-cols-2 gap-4">
+              <div
+                id="security-elements"
+                className="grid grid-cols-1 lg:grid-cols-2 gap-4"
+              >
                 {securityNameList.map((item) => {
                   return <SecurityItem name={item} key={item} />;
                 })}
@@ -76,9 +90,10 @@ const AccountPage = async () => {
           className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 gap-4"
         >
           <AddressCard />
-          {AddressList.map((item, index) => {
+          {userAddrsses.map((item, index) => {
             return (
-              <AddressCard address={item} recipientName={name} key={index} />
+              // <AddressCard address={item} recipientName={name} key={index} />
+              <Address_2 data={item} key={index} />
             );
           })}
         </div>

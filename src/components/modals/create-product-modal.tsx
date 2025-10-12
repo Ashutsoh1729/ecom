@@ -1,5 +1,10 @@
 "use client";
 
+import {
+  availableColors,
+  availableSizes,
+  productModalFormSchema,
+} from "@/util/types/product";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm, useFormContext } from "react-hook-form";
 import z from "zod";
@@ -36,70 +41,15 @@ import { Plus, TrashIcon } from "lucide-react";
 import { useState } from "react";
 import { useModalStore } from "@/util/states/modal";
 
-import { createProduct } from "@/actions/product/product-actions";
+import { createProduct } from "@/actions/(seller)/product/product-actions";
 import { toast } from "sonner";
-
-export const availableColors = [
-  { name: "Classic Black", hex: "#000000" },
-  { name: "Snow White", hex: "#FFFFFF" },
-  { name: "Forest Green", hex: "#228B22" },
-  { name: "Crimson Red", hex: "#DC143C" },
-];
-
-export const availableSizes = ["xs", "s", "m", "l", "xl", "xxl"];
-
-const availableColorsNames = availableColors.map((item) => item.hex);
-
-export const variantsFormSchema = z.object({
-  // name, color, size, price, quantity
-  name: z
-    .string()
-    .min(3, "Minimum length should be 2.")
-    .max(15, "Name cannot be greater than 15 characters"),
-  color: z.enum(availableColorsNames),
-  size: z.enum(availableSizes),
-  price: z.coerce.number(),
-  quantity: z.coerce.number(),
-});
-
-// TODO: Will add a feature to show error while trying to give invalid number data by using differernt input and output types which will show error on ui if string is given and also parse the string inputs to number
-
-// const variantFormForInput = variantsFormSchema.partial().extend()
-
-const categoriesFormSchema = z.object({
-  name: z.string().min(3, "Min cat name 3").max(10, "Max cat name 10"),
-  // slug: z.string().min(3, "Min cat name 3"),
-});
-
-const tagsFormSchema = z.object({
-  name: z.string().min(3, "Min cat name 3").max(10, "Max cat name 10"),
-  description: z
-    .string()
-    .min(3, "Min cat name 3")
-    .max(300, "Max desc 300 char"),
-});
-
-const productModalFormSchema = z.object({
-  name: z
-    .string()
-    .min(3, "Minimum length should be 2.")
-    .max(15, "Name cannot be greater than 15 characters"),
-  description: z
-    .string()
-    .min(10, "Minimum description should be at least 10 characters.")
-    .max(300, "Max char 300 for desc"),
-  status: z.enum(["draft", "active", "archive"]),
-  storeId: z.string(),
-  variants: z.array(variantsFormSchema),
-  categories: z.array(categoriesFormSchema).min(1),
-  // categories: z.array(categoriesFormSchema).optional(),
-  // tags: z.array(tagsFormSchema).min(1),
-  tags: z.array(tagsFormSchema).optional(),
-});
-
+import { useRouter } from "next/navigation";
 //  NOTE: First step is done.
 
 const Step_1 = ({ storeList }: { storeList: storesList }) => {
+  // Get access to all form methods from the context
+  const { setValue } = useFormContext();
+
   return (
     <div className="space-y-4">
       <FormField
@@ -178,6 +128,29 @@ const Step_1 = ({ storeList }: { storeList: storesList }) => {
               </FormControl>
               <FormMessage />
               {/* <FormDescription></FormDescription> */}
+            </FormItem>
+          )}
+        />
+        <FormField
+          name="image"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Product Image</FormLabel>
+              <FormControl>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    // Get the selected file
+                    const file = e.target.files?.[0];
+                    // Update the form value with the file
+                    // RHF's `onChange` would normally be used, but for files,
+                    // `setValue` is more explicit and reliable.
+                    setValue("image", file);
+                  }}
+                />
+              </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -480,8 +453,11 @@ const Step_3 = () => {
 type In = z.input<typeof productModalFormSchema>; // RHF values (strings from inputs)
 export type Out = z.output<typeof productModalFormSchema>; // After zod transforms (numbers)
 
+// TODO: I have added the form field to take image as input but i have not set the backend and db to store it. I have to work upon it.
+
 const CreateProductModal = () => {
   const storeList = useStoreList();
+
   const { closeModal } = useModalStore();
   const [step, setStep] = useState(1);
   const form = useForm<In, unknown, Out>({
@@ -493,8 +469,10 @@ const CreateProductModal = () => {
       variants: [],
       categories: [],
       tags: [],
+      image: undefined,
     },
   });
+  const route = useRouter();
 
   const STEPS: {
     number: number;
@@ -504,7 +482,7 @@ const CreateProductModal = () => {
     {
       number: 1,
       title: "Product Information",
-      fields: ["name", "description", "status", "storeId"],
+      fields: ["name", "description", "status", "storeId", "image"],
     },
     { number: 2, title: "Variants & Pricing", fields: ["variants"] },
     { number: 3, title: "Organization", fields: ["categories", "tags"] },
@@ -536,7 +514,9 @@ const CreateProductModal = () => {
   const onSubmit = async (data: Out) => {
     console.log("Form Submitted:", data);
     // console.log(step);
+
     // NOTE: It is working only when the step 3 has atleast one none-optional point
+
     await createProduct(data);
     /*     console.log("The onSubmit button is clicked");
     console.log(form.formState); */
@@ -545,12 +525,30 @@ const CreateProductModal = () => {
       description: "Your new Product is now ready for Sales.",
     });
 
+    route.refresh();
     handleClose();
   };
 
+  // If user don't have any store, first tell him to create a store
+  if (storeList?.length === 0) {
+    // toast("create a store first");
+    return (
+      <div className="px-6 py-2 flex items-center justify-between">
+        You dont&apos; have a stoer yet. Close this and create a store first.
+        <button
+          type="button"
+          onClick={handleClose}
+          className="text-slate-300 hover:text-slate-600 text-2xl hover:cursor-pointer"
+        >
+          &times;
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div>
-      <Card className="pt-0  border-0 outline-none ring-0 focus:ring-0 shadow-none">
+      <Card className="py-4 px-4  border-0 outline-none ring-0 focus:ring-0 shadow-none">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <CardHeader className="px-0">
@@ -561,14 +559,13 @@ const CreateProductModal = () => {
                   </p>
                   <CardTitle>{STEPS[step - 1].title}</CardTitle>
                 </div>
-                {/* 
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="text-slate-400 hover:text-slate-600 text-2xl"
+                  className="text-slate-300 hover:text-slate-600 text-2xl hover:cursor-pointer"
                 >
                   &times;
-                </button> */}
+                </button>
               </div>
             </CardHeader>
             <CardContent className="px-0">

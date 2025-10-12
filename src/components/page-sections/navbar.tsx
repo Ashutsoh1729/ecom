@@ -4,13 +4,14 @@ import Link from "next/link";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import AvatarIcon from "../util/avatar-icon";
+import AvatarIcon from "../../app/components/avatar-icon";
 import { Heart, ShoppingBag } from "lucide-react";
+import { useCartStore } from "@/app/(public)/lib/cart-schema";
 
 const Navbar = ({ userRole }: { userRole: "Buyer" | "Seller" }) => {
   const router = useRouter();
   const { data: session } = useSession();
-  console.log(`The session data is: ${session?.expires}`);
+  const { items } = useCartStore();
 
   const handleSignIn = () => {
     router.push("/auth/sign-in");
@@ -45,14 +46,19 @@ const Navbar = ({ userRole }: { userRole: "Buyer" | "Seller" }) => {
                 // router.push("/likes");
               }}
             />
-            <ShoppingBag
-              size={28}
-              strokeWidth={1.5}
-              className="hover:cursor-pointer"
-              onClick={() => {
-                router.push("/shopping-bag");
-              }}
-            />
+            <div className="relative flex items-center">
+              <ShoppingBag
+                size={28}
+                strokeWidth={1.5}
+                className="hover:cursor-pointer"
+                onClick={() => {
+                  router.push("/shopping-bag");
+                }}
+              />
+              <span className="top-[-6px] right-[-10px] px-[6px] py-[2px] absolute bg-black flex items-center justify-center  rounded-full text-white text-[10px] font-medium">
+                {items.length}
+              </span>
+            </div>
           </div>
           <div id="nav-action" className="flex items-center ">
             {session?.user ? (

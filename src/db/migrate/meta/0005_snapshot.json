@@ -1,6 +1,6 @@
 {
-  "id": "1d785df0-87b2-43d5-8a1f-761cbcc35a08",
-  "prevId": "a6be2d8c-0c6d-4b05-89bc-dbb0df5a0dcc",
+  "id": "b79a6c3d-18c3-4db4-b503-7eae719d179b",
+  "prevId": "724c1cb8-4b45-488e-b4c0-e05e27ad7751",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -80,6 +80,107 @@
         "account_userId_user_id_fk": {
           "name": "account_userId_user_id_fk",
           "tableFrom": "account",
+          "tableTo": "user",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.addresses": {
+      "name": "addresses",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "recipient_name": {
+          "name": "recipient_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lane1": {
+          "name": "lane1",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lane2": {
+          "name": "lane2",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "landmark": {
+          "name": "landmark",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "city": {
+          "name": "city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "state": {
+          "name": "state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "postal_code": {
+          "name": "postal_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "country": {
+          "name": "country",
+          "type": "address_country",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "address_type": {
+          "name": "address_type",
+          "type": "address_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "other_address_type": {
+          "name": "other_address_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "addresses_userId_user_id_fk": {
+          "name": "addresses_userId_user_id_fk",
+          "tableFrom": "addresses",
           "tableTo": "user",
           "columnsFrom": [
             "userId"
@@ -442,7 +543,13 @@
           "name": "slug",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
+        },
+        "main_img": {
+          "name": "main_img",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         },
         "status": {
           "name": "status",
@@ -459,8 +566,8 @@
           "notNull": true,
           "default": "now()"
         },
-        "updatedAt": {
-          "name": "updatedAt",
+        "updated_at": {
+          "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
@@ -484,7 +591,29 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "products_name_unique": {
+          "name": "products_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "name"
+          ]
+        },
+        "products_slug_unique": {
+          "name": "products_slug_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "slug"
+          ]
+        },
+        "products_main_img_unique": {
+          "name": "products_main_img_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "main_img"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -735,6 +864,13 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
+        "stores_store_name_unique": {
+          "name": "stores_store_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "store_name"
+          ]
+        },
         "stores_slug_unique": {
           "name": "stores_slug_unique",
           "nullsNotDistinct": false,
@@ -892,6 +1028,23 @@
     }
   },
   "enums": {
+    "public.address_country": {
+      "name": "address_country",
+      "schema": "public",
+      "values": [
+        "India",
+        "United States"
+      ]
+    },
+    "public.address_type": {
+      "name": "address_type",
+      "schema": "public",
+      "values": [
+        "Home",
+        "Work",
+        "Other"
+      ]
+    },
     "public.product_status": {
       "name": "product_status",
       "schema": "public",

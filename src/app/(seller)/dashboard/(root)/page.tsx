@@ -1,5 +1,6 @@
 import { getUserRole } from "@/lib/logic";
 import { redirect } from "next/navigation";
+import DashboardSections from "./components/sections";
 
 const DashboardPage = async () => {
   const userRole = await getUserRole();
@@ -8,7 +9,12 @@ const DashboardPage = async () => {
     redirect("/");
   }
 
-  return <div>This is DashboardPage</div>;
+  return (
+    <div>
+      This is DashboardPage
+      <DashboardSections />
+    </div>
+  );
 };
 
 export default DashboardPage;

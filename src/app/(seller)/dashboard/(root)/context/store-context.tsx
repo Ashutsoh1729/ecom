@@ -1,17 +1,17 @@
 "use client";
 
-import {
-  getSellerStoreAllDataOutputInterface,
-  productDataInterface,
-} from "@/lib/data/products";
+import { getSellerStoreAllDataOutputInterface } from "@/lib/data/products";
 import { StoreTableDataInterface } from "@/lib/logic";
+
+// createContext is for creating context and providing it, as it works as a wrapper element
+// Then useContext is used for extracting the context,if it exists inside the wapper element
+
 import { createContext, ReactNode, useContext } from "react";
 
 // It is going to use provide context to the children components of a layout file
 // TODO: I will combine this storeList and productList and will give all the data from one place, in one go
 
 export type storesList = StoreTableDataInterface[];
-export type productList = productDataInterface[];
 export type allDataListType = getSellerStoreAllDataOutputInterface[];
 
 // 1. Create the Context with a default value
@@ -19,7 +19,7 @@ export type allDataListType = getSellerStoreAllDataOutputInterface[];
 // without a matching provider higher up in the tree.
 
 const StoreContext = createContext<storesList | null>(null);
-const ProductContext = createContext<productList | null>(null);
+// const ProductContext = createContext<productList | null>(null);
 const AllStoresDataContext = createContext<allDataListType | null>(null);
 
 // 2. Create a Provider Component
@@ -31,10 +31,10 @@ interface StoreProviderProps {
   value: storesList | null; // The data you want to provide
 }
 
-interface ProductProviderProps {
+/* interface ProductProviderProps {
   children: ReactNode;
   value: productList | null;
-}
+} */
 
 interface AllStoresDataProviderProps {
   children: ReactNode;
@@ -47,11 +47,11 @@ export function StoreProvider({ children, value }: StoreProviderProps) {
   );
 }
 
-export function ProductProvider({ children, value }: ProductProviderProps) {
+/* export function ProductProvider({ children, value }: ProductProviderProps) {
   return (
     <ProductContext.Provider value={value}>{children}</ProductContext.Provider>
   );
-}
+} */
 
 export function AllStoreDataProvider({
   children,
@@ -79,13 +79,13 @@ export function useStoreList() {
   return context;
 }
 
-export function useProductList() {
+/* export function useProductList() {
   const context = useContext(ProductContext);
   if (context === undefined) {
     throw new Error("useProductList must be inside of a ProductProvider");
   }
   return context;
-}
+} */
 
 export function useAllStoresDataList() {
   const context = useContext(AllStoresDataContext);

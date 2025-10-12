@@ -1,18 +1,29 @@
 "use client";
 
+import { useCartStore } from "@/app/(public)/lib/cart-schema";
 import Image from "next/image";
 
 interface ProductCardForBagInterface {
   name: string;
   variant?: string;
   imgAddr?: string;
+  variantId: string;
+  productId: string;
 }
 
 const ProductCardForBag = ({
   name,
   variant,
   imgAddr,
+  variantId,
+  productId,
 }: ProductCardForBagInterface) => {
+  const { removeItem } = useCartStore();
+
+  const handleRemoveItem = () => {
+    removeItem(productId, variantId);
+  };
+
   return (
     <div className="flex gap-8">
       <div id="image" className="rounded-md overflow-hidden">
@@ -40,7 +51,10 @@ const ProductCardForBag = ({
           )}
         </div>
 
-        <button className="text-rose-500 w-fit font-medium hover:cursor-pointer text-sm">
+        <button
+          className="text-rose-500 w-fit font-medium hover:cursor-pointer text-sm"
+          onClick={handleRemoveItem}
+        >
           remove
         </button>
       </div>

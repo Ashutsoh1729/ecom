@@ -5,7 +5,7 @@ import slugify from "slugify";
 import { storeFormSchema } from "@/components/modals/create-store-modal";
 import { db } from "@/db/client";
 import { sellers, stores } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import z from "zod";
 import { nanoid } from "nanoid";
@@ -70,4 +70,16 @@ export async function deleteStore(storeId: string) {
     throw new Error("Store id is required for deleting a store");
   }
   await db.delete(stores).where(eq(stores.id, storeId));
+}
+
+export async function updateActiveStatus(storeId: string) {
+  if (!storeId) {
+    console.error("Store id is required to delete a store");
+    throw new Error("Store id is required for deleting a store");
+  }
+
+  await db
+    .update(stores)
+    .set({ isActive: sql`not ${stores.isActive}` })
+    .where(eq(stores.id, storeId));
 }

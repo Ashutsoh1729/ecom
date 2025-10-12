@@ -1,52 +1,7 @@
 import { db } from "@/db/client";
 import { products, stores } from "@/db/schema";
-import { eq, inArray } from "drizzle-orm";
-import { StoreTableDataInterface } from "../logic";
+import { eq } from "drizzle-orm";
 import { auth } from "@/auth";
-
-export interface productDataInterface {
-  name: string;
-  storeId: string;
-  status: "draft" | "active" | "archived";
-  variants: { price: number; quantity: number }[];
-}
-
-export const getProductList = async ({
-  storeList,
-}: {
-  storeList: StoreTableDataInterface[];
-}): Promise<productDataInterface[]> => {
-  // TODO: 1. get the stores list in the name of the user, 2. map through them and get all the products associated with thoes stores, 3. return them in a list format
-
-  const storeIdList = storeList.map((store) => store.storeId);
-
-  const listOfProducts = await db.transaction(async (tx) => {
-    // here we can access multiple time db with just one call
-    const allProductsWithVariants = await tx.query.products.findMany({
-      where: inArray(products.storeId, storeIdList),
-      columns: {
-        storeId: true,
-        name: true,
-        status: true,
-      },
-      with: {
-        variants: {
-          columns: {
-            price: true,
-            quantity: true,
-          },
-        },
-      },
-    });
-
-    return allProductsWithVariants;
-  });
-
-  // adding the store name
-  // const finalProductList = listOfProducts.map((product) => {});
-
-  return listOfProducts;
-};
 
 export interface getSellerStoreAllDataOutputInterface {
   id: string;
@@ -56,7 +11,9 @@ export interface getSellerStoreAllDataOutputInterface {
   products: {
     id: string;
     name: string;
+    description: string | null;
     slug: string;
+    mainImageUrl: string;
     status: "draft" | "active" | "archived";
     variants: {
       price: number;
@@ -91,7 +48,8 @@ export const getSellerStoreAllData = async () => {
       products: {
         columns: {
           id: true,
-
+          mainImageUrl: true,
+          description: true,
           name: true,
           status: true,
           slug: true,
@@ -111,4 +69,40 @@ export const getSellerStoreAllData = async () => {
   });
 
   return storesWithDetails;
+};
+
+export interface getAllProductInterface {
+  id: string;
+  name: string;
+  description: string | null;
+  slug: string;
+  mainImageUrl: string;
+  status: "draft" | "active" | "archived";
+  variants: {
+    price: number;
+    name: string;
+    id: string;
+  }[];
+}
+
+// only extract the active products
+export const getAllProduct = async () => {
+  const allProductData = await db.query.products.findMany({
+    where: eq(products.status, "active"),
+    columns: {
+      storeId: false,
+      createdAt: false,
+      updatedAt: false,
+    },
+    with: {
+      variants: {
+        columns: {
+          price: true,
+          name: true,
+          id: true,
+        },
+      },
+    },
+  });
+  return allProductData;
 };

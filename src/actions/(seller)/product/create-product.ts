@@ -8,13 +8,17 @@ import { createInsertSchema } from "drizzle-zod";
 import { nanoid } from "nanoid";
 import slugify from "slugify";
 import z from "zod";
+import { uploadFileToS3 } from "./s3";
 
 // For creating a new product
+
+// TODO: I have to complete the uploading function for the image
 // NOTE: Create product working perfectly fine.
 
 const createProduct = async (data: Out) => {
   const productInsertSchema = createInsertSchema(products);
   const productVariantInsertSchema = createInsertSchema(productVariants);
+  // as product id is not creatd, and it is needed to create the variants row
   const partialVariantInsertSchema = z.array(
     productVariantInsertSchema.omit({
       productId: true,
@@ -24,23 +28,10 @@ const createProduct = async (data: Out) => {
   const tagsInsertSchema = z.array(createInsertSchema(tags));
 
   try {
-    /*     const session = await auth();
+    // first upload the image to the aws and after gettting the image, we will create the product
+    // const folderName = `${data.storeId}-${data.name}`;
 
-    if (!session?.user) {
-      throw new Error("User dosen't exits.");
-    }
-    if (!session.user.id) {
-      throw new Error("User don't have a id");
-    }
-
-    const sellerId = session.user.sellerId;
-
-    // const categorySlugArray = data.categories?.map((item)=>{})
-
-    if (!sellerId) {
-      throw new Error("Seller Id not found while creating product. ");
-    }
- */
+    const imageUrl = await uploadFileToS3(data.image, data.storeId, data.name);
     // -- Splitting the data with respect to their table --
 
     // product data creating dataset
@@ -50,6 +41,7 @@ const createProduct = async (data: Out) => {
       status: data.status,
       storeId: data.storeId,
       slug: generateProductSlug(data.name),
+      mainImageUrl: imageUrl,
     };
 
     const partialProductVariantData = data.variants.map((item) => {

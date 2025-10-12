@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import { Button } from "../ui/button";
-import { ReactNode } from "react";
+import { ComponentType, ReactNode } from "react";
+import { LucideProps } from "lucide-react";
 
 export interface SectionHeaderInterface {
   name: string;
@@ -11,7 +12,14 @@ export interface SectionHeaderInterface {
   hasIcon?: boolean;
   iconType?: "leading" | "trailing" | "icon only";
   iconAddr?: string;
-  iconComponent?: ReactNode;
+  IconComponent?: ComponentType<LucideProps>;
+  buttonVariant?:
+    | "outline"
+    | "default"
+    | "destructive"
+    | "secondary"
+    | "ghost"
+    | "link";
   buttonAction?: () => void;
 }
 
@@ -22,8 +30,9 @@ const SectionHeader = ({
   hasIcon,
   iconType,
   iconAddr,
-  iconComponent,
+  IconComponent,
   buttonAction,
+  buttonVariant = "outline",
 }: SectionHeaderInterface) => {
   function handleClick() {
     if (buttonAction) {
@@ -40,26 +49,27 @@ const SectionHeader = ({
         {hasCTA && (
           <div id="action-container">
             <Button
-              variant={"outline"}
+              variant={buttonVariant}
               onClick={handleClick}
               className="px-5  hover:cursor-pointer flex"
             >
               {hasIcon &&
-                (iconType === "leading" || iconType === "icon only") &&
-                iconAddr && <Image src={iconAddr} alt="leading icon" />}
-
-              {hasIcon &&
-                (iconType === "leading" || iconType === "icon only") &&
-                !iconAddr &&
-                iconComponent}
+                iconType === "leading" &&
+                (iconAddr ? (
+                  <Image src={iconAddr} alt="leading icon" />
+                ) : (
+                  IconComponent && <IconComponent />
+                ))}
 
               {iconType != "icon only" && ctaName}
 
-              {hasIcon && iconType === "trailing" && !iconAddr && iconComponent}
-
-              {hasIcon && iconType === "trailing" && iconAddr && (
-                <Image src={iconAddr} alt="leading icon" />
-              )}
+              {hasIcon &&
+                iconType === "trailing" &&
+                (iconAddr ? (
+                  <Image src={iconAddr} alt="trailing icon" />
+                ) : (
+                  IconComponent && <IconComponent />
+                ))}
             </Button>
           </div>
         )}

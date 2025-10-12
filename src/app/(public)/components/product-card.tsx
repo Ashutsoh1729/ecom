@@ -1,16 +1,25 @@
 "use client";
 
 import Image from "next/image";
-import { Button } from "../ui/button";
-import { StarIcon } from "lucide-react";
+import { Button } from "../../../components/ui/button";
+import { ChevronRight, StarIcon } from "lucide-react";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import { LikeButton } from "./like-btn";
+import { useRouter } from "next/navigation";
 
 export interface ProductCardInterface {
   img: string;
   alt: string;
   productName: string;
+  slug: string;
   price: number;
-  rating: number;
-  category: string;
+  rating?: number;
+  category?: string;
 }
 
 const ProductCard: React.FC<ProductCardInterface> = ({
@@ -20,7 +29,7 @@ const ProductCard: React.FC<ProductCardInterface> = ({
   price,
   rating,
   category,
-}) => {
+}: ProductCardInterface) => {
   function handleAddToCart() {
     console.log("Item added to cart. Item name: ${productName}");
   }
@@ -70,7 +79,7 @@ const ProductCard: React.FC<ProductCardInterface> = ({
                 className="w-full flex items-center justify-center"
                 onClick={handleAddToCart}
               >
-                Add to Cart
+                View Product <ChevronRight />
               </Button>
             </div>
           </div>
@@ -80,4 +89,54 @@ const ProductCard: React.FC<ProductCardInterface> = ({
   );
 };
 
+const ProductCard_2 = ({
+  img,
+  slug,
+  productName,
+  alt,
+  price,
+}: ProductCardInterface) => {
+  const router = useRouter();
+  return (
+    <div>
+      <Card className="gap-0 p-4 hover:cursor-pointer">
+        <CardContent className="p-0 relative">
+          <div className="absolute z-30 right-0 top-0 mr-2 mt-2">
+            <LikeButton slug={slug} productName={productName} />
+          </div>
+          <Image
+            src={img}
+            alt={alt}
+            className="rounded-[8px] bg-zinc-300 w-full"
+            width={500}
+            height={600}
+            unoptimized
+          />
+          <div
+            id="client-product-card"
+            className="flex w-full mt-2 items-end justify-between"
+          >
+            <p className="text-[18px] text-gray-600">{productName}</p>
+            <p className="text-lg font-bold text-gray-800">₹{price}</p>
+          </div>
+        </CardContent>
+        <CardFooter className="mt-2 p-0">
+          <CardAction className="w-full">
+            <Button
+              className="w-full flex items-center hover:cursor-pointer"
+              variant={"outline"}
+              onClick={() => {
+                router.push(`/products/${slug}`);
+              }}
+            >
+              View in details
+              <ChevronRight />
+            </Button>
+          </CardAction>
+        </CardFooter>
+      </Card>
+    </div>
+  );
+};
 export default ProductCard;
+export { ProductCard_2 };

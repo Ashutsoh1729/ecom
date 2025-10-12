@@ -11,7 +11,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
   callbacks: {
     // This callback runs whenever a JWT is created or updated.
-    async jwt({ token }) {
+    async jwt({ token, trigger, session }) {
       // getting the users id
       if (!token.sub) return token; // As token.sub is the userID
 
@@ -45,6 +45,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.id = token.sub;
         // Assigning the user role of the token to the session
         session.user.role = token.role; // <-- Add the role from the DB
+        // TODO: Delete the console log
+        // console.log(session.user.role);
       }
       if (token.sellerId && session.user) {
         session.user.sellerId = token.sellerId;

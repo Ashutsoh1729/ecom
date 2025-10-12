@@ -8,6 +8,8 @@ import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import CreateStoreModal from "../modals/create-store-modal";
 import CreateProductModal from "../modals/create-product-modal";
+import AddressModal from "../modals/address-modal";
+import { getStoreList } from "@/lib/logic";
 
 // A mapping from modal type to the actual component
 const modalComponents = {
@@ -16,12 +18,11 @@ const modalComponents = {
   sellerCreating: SellerApplicationModal,
   storeCreating: CreateStoreModal,
   productCreating: CreateProductModal,
+  addressCreating: AddressModal,
 };
 
 const ModalManager = () => {
   const { activeModal, closeModal } = useModalStore();
-
-  // TODO: Still the error is not completly gone. the background is not transparent and i need to work on it.
 
   if (!activeModal) {
     return null;
@@ -41,7 +42,8 @@ const ModalManager = () => {
           e.stopPropagation();
         }}
       >
-        <div className="w-full flex justify-end items-center h-full py-2 pr-4">
+        {/* The modal has to have their own header  */}
+        {/* <div className="w-full flex justify-end items-center h-full py-2 pr-4">
           <Button
             variant={"ghost"}
             onClick={closeModal}
@@ -49,10 +51,9 @@ const ModalManager = () => {
           >
             <X />
           </Button>
-        </div>
+        </div> */}
         {/* ... close button ... */}
-        <Separator />
-        <div className="px-6 pt-3 pb-4">
+        <div className="">
           <ActiveModalComponent />
         </div>
       </div>

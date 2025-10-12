@@ -1,5 +1,21 @@
-import { ProductCardInterface } from "@/components/util/product-card";
-import { Address, AddressType } from "./types/address";
+import { ProductCardInterface } from "@/app/test/product-card";
+
+enum AddressType {
+  home = "HOME",
+  work = "WORK",
+  other = "OTHER",
+}
+
+export interface Address {
+  type: AddressType;
+  addressLane1: string;
+  addressLane2?: string;
+  landmark?: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+}
 
 export interface navLink {
   name: string;

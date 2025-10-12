@@ -1,6 +1,6 @@
 {
-  "id": "cf54a537-5a21-453f-b4b1-48db727f512c",
-  "prevId": "84b20926-f05d-4376-844c-5aa7b22d6d2f",
+  "id": "8b57e27d-eb7b-4bd0-8059-c447084dbbea",
+  "prevId": "f4d9a636-717a-4af1-8c8a-cfca57efe252",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -80,6 +80,107 @@
         "account_userId_user_id_fk": {
           "name": "account_userId_user_id_fk",
           "tableFrom": "account",
+          "tableTo": "user",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.addresses": {
+      "name": "addresses",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "recipient_name": {
+          "name": "recipient_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lane1": {
+          "name": "lane1",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lane2": {
+          "name": "lane2",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "landmark": {
+          "name": "landmark",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "city": {
+          "name": "city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "state": {
+          "name": "state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "postal_code": {
+          "name": "postal_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "country": {
+          "name": "country",
+          "type": "address_country",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "address_type": {
+          "name": "address_type",
+          "type": "address_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "other_address_type": {
+          "name": "other_address_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "addresses_userId_user_id_fk": {
+          "name": "addresses_userId_user_id_fk",
+          "tableFrom": "addresses",
           "tableTo": "user",
           "columnsFrom": [
             "userId"
@@ -438,6 +539,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "status": {
           "name": "status",
           "type": "product_status",
@@ -478,7 +585,15 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "products_slug_unique": {
+          "name": "products_slug_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "slug"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -643,51 +758,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.session": {
-      "name": "session",
-      "schema": "",
-      "columns": {
-        "sessionToken": {
-          "name": "sessionToken",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "userId": {
-          "name": "userId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "expires": {
-          "name": "expires",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "session_userId_user_id_fk": {
-          "name": "session_userId_user_id_fk",
-          "tableFrom": "session",
-          "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.stores": {
       "name": "stores",
       "schema": "",
@@ -758,10 +828,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "stores_seller_id_user_id_fk": {
-          "name": "stores_seller_id_user_id_fk",
+        "stores_seller_id_sellers_id_fk": {
+          "name": "stores_seller_id_sellers_id_fk",
           "tableFrom": "stores",
-          "tableTo": "user",
+          "tableTo": "sellers",
           "columnsFrom": [
             "seller_id"
           ],
@@ -931,6 +1001,23 @@
     }
   },
   "enums": {
+    "public.address_country": {
+      "name": "address_country",
+      "schema": "public",
+      "values": [
+        "India",
+        "United States"
+      ]
+    },
+    "public.address_type": {
+      "name": "address_type",
+      "schema": "public",
+      "values": [
+        "Home",
+        "Work",
+        "Other"
+      ]
+    },
     "public.product_status": {
       "name": "product_status",
       "schema": "public",

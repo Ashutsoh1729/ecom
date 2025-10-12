@@ -1,6 +1,5 @@
 "use client";
 
-import { useAllStoresDataList } from "../../(root)/context/store-context";
 import {
   Table,
   TableBody,
@@ -15,6 +14,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { useRouter } from "next/navigation";
 
 export type productTableList = {
   name: string;
@@ -34,7 +34,7 @@ interface ProductPageTableProps<TData, TValue> {
   data: TData[];
 }
 
-const ProductPageTable_2 = <TData, TValue>({
+const ProductPageTable_2 = <TData extends { slug: string }, TValue>({
   columns,
   data,
 }: ProductPageTableProps<TData, TValue>) => {
@@ -43,6 +43,9 @@ const ProductPageTable_2 = <TData, TValue>({
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
+
+  const router = useRouter();
+
   return (
     <div className="border rounded-md">
       <Table>
@@ -68,6 +71,10 @@ const ProductPageTable_2 = <TData, TValue>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
+                onClick={() => {
+                  const slug = row.original.slug;
+                  router.push(`/dashboard/products/${slug}`);
+                }}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>

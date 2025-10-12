@@ -3,7 +3,6 @@ import SectionHeader from "@/components/page-sections/section-header";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -14,14 +13,40 @@ import ProductCardForBag from "./shopping-bag-product-card";
 import { useRouter } from "next/navigation";
 import BagQuantityButton from "./quantity-btn";
 import { useState } from "react";
+import { useCartStore } from "@/app/(public)/lib/cart-schema";
+import BagActionSection from "./bag-action";
 
 const BagSections = () => {
   const router = useRouter();
-  const [q1, setQ1] = useState(1);
+  const { items } = useCartStore();
 
   const handleFirstHeaderAction = () => {
     router.push("/");
   };
+
+  // The global hook is working perfectly as expected
+  /* useEffect(() => {
+    console.log(items);
+  }, [items]); */
+
+  if (items.length === 0) {
+    return (
+      <div>
+        <SectionHeader
+          name="My Bag"
+          hasCTA={true}
+          ctaName="continue shopping"
+          hasIcon={true}
+          IconComponent={ChevronsLeft}
+          iconType="leading"
+          buttonAction={handleFirstHeaderAction}
+        />
+        <div className="flex items-center justify-center pt-24">
+          Your shopping bag is empty, please add some items to it.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -30,12 +55,12 @@ const BagSections = () => {
         hasCTA={true}
         ctaName="continue shopping"
         hasIcon={true}
-        iconComponent={<ChevronsLeft />}
+        IconComponent={ChevronsLeft}
         iconType="leading"
         buttonAction={handleFirstHeaderAction}
       />
 
-      <div id="bag-table">
+      <div id="bag-table" className="mt-12">
         <Table>
           {/* <TableCaption>Table of your cart product</TableCaption> */}
           <TableHeader>
@@ -47,7 +72,32 @@ const BagSections = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
+            {items.map((item, index) => {
+              return (
+                <TableRow key={index}>
+                  <TableCell>
+                    <ProductCardForBag
+                      name={item.productName}
+                      variant={item.variantName}
+                      imgAddr={item.imageUrl}
+                      variantId={item.variantId}
+                      productId={item.productId}
+                    />
+                  </TableCell>
+
+                  <TableCell>
+                    <BagQuantityButton
+                      variantId={item.variantId}
+                      productId={item.productId}
+                    />
+                  </TableCell>
+                  <TableCell>{item.price}</TableCell>
+                  <TableCell>{item.quantity * item.price}</TableCell>
+                </TableRow>
+              );
+            })}
+
+            {/* <TableRow>
               <TableCell>
                 <ProductCardForBag
                   name="Aomnis"
@@ -60,9 +110,10 @@ const BagSections = () => {
               </TableCell>
               <TableCell>₹ 1200</TableCell>
               <TableCell>{q1 * 1200}</TableCell>
-            </TableRow>
+            </TableRow> */}
           </TableBody>
         </Table>
+        <BagActionSection />
       </div>
     </div>
   );

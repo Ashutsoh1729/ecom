@@ -1,6 +1,8 @@
 import ProductIndivisualPageSections from "./components/sections";
 
-const ProductIndivisualPage = () => {
+const ProductIndivisualPage = async () => {
+  // const mainImage = await getMainImage();
+
   return (
     <div>
       <ProductIndivisualPageSections />

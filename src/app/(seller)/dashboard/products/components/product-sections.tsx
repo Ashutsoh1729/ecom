@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { useModalStore } from "@/util/states/modal";
 import {
   allDataListType,
@@ -11,12 +10,14 @@ import { ProductPageTable_2 } from "./product-table";
 import { getProductColumns, productTableColumn } from "./columns";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { deleteProduct } from "@/actions/product/product-actions";
+import { deleteProduct } from "@/actions/(seller)/product/product-actions";
+import SectionHeader from "@/components/page-sections/section-header";
+import { PlusIcon } from "lucide-react";
 
 function processedProductList(allStoreData: allDataListType) {
   const productList = allStoreData.flatMap((store) => {
     let newProductData: productTableColumn[] | [];
-    if (store.products.length > 0) {
+    if (store.products.length > 0 && store.isActive) {
       newProductData = store.products.map((product) => {
         const priceList = product.variants.map((variant) => variant.price);
         const minPrice = Math.min(...priceList);
@@ -34,6 +35,8 @@ function processedProductList(allStoreData: allDataListType) {
           name: product.name,
           status: product.status,
           storeName: store.storeName,
+          slug: product.slug,
+          mainImg: product.mainImageUrl,
           price:
             product.variants.length > 0
               ? minPrice != maxPrice
@@ -44,7 +47,7 @@ function processedProductList(allStoreData: allDataListType) {
             product.variants.length > 0
               ? minQuantity != maxQuantity
                 ? `${minQuantity}-${maxQuantity}`
-                : `${minPrice}`
+                : `${minQuantity}`
               : `0`,
         };
       });
@@ -95,17 +98,22 @@ const ProductSections = () => {
   });
  */
   return (
-    <div>
-      <Button
-        onClick={() => {
+    <div className="w-full h-full px-16 pt-12">
+      <SectionHeader
+        name="Your Products"
+        hasCTA
+        ctaName="Create Product"
+        buttonVariant="default"
+        hasIcon
+        iconType="leading"
+        IconComponent={PlusIcon}
+        buttonAction={() => {
           if (storeLists === null) {
           }
 
           openModal("productCreating");
         }}
-      >
-        Create Product
-      </Button>
+      />
 
       <div className="pt-12 pb-12" id="product-table">
         {/* <ProductPageTable /> */}

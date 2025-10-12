@@ -6,7 +6,8 @@ export type ModalType =
   | "editProfile"
   | "sellerCreating"
   | "storeCreating"
-  | "productCreating";
+  | "productCreating"
+  | "addressCreating";
 
 interface ModalState {
   activeModal: ModalType | null; // 2. State now holds the type of modal, or null

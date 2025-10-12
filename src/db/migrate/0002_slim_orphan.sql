@@ -1,0 +1,2 @@
+CREATE TYPE "public"."address_country" AS ENUM('India', 'United States');--> statement-breakpoint
+ALTER TABLE "addresses" ALTER COLUMN "country" SET DATA TYPE "public"."address_country" USING "country"::"public"."address_country";

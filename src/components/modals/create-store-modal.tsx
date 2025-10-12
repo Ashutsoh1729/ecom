@@ -18,7 +18,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Switch } from "../ui/switch";
-import createNewStore from "@/actions/store-actions";
+import createNewStore from "@/actions/(seller)/store-actions";
 import { useRouter } from "next/navigation";
 // 1. Define the validation schema with Zod based on the 'stores' table
 export const storeFormSchema = z.object({
@@ -85,11 +85,24 @@ const CreateStoreModal = () => {
   }
 
   return (
-    <div className="">
-      <h2 className="text-2xl font-bold text-gray-800">Create a New Store</h2>
-      <p className="mt-2 text-sm text-gray-600">
-        Fill out the details below to get your new store up and running.
-      </p>
+    <div className="py-4 px-4">
+      <div className="flex justify-between w-full">
+        <div className="flex flex-col justify-between w-fit">
+          <h2 className="text-2xl font-bold text-gray-800">
+            Create a New Store
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Fill out the details below to get your new store up and running.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={closeModal}
+          className="text-slate-400 hover:text-slate-600 text-3xl hover:cursor-pointer"
+        >
+          &times;
+        </button>
+      </div>
 
       {/* 4. Build the form with Shadcn UI components */}
       <Form {...form}>

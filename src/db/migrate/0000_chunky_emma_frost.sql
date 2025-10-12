@@ -1,3 +1,4 @@
+CREATE TYPE "public"."address_type" AS ENUM('Home', 'Work', 'Other');--> statement-breakpoint
 CREATE TYPE "public"."product_status" AS ENUM('draft', 'active', 'archived');--> statement-breakpoint
 CREATE TYPE "public"."user_role" AS ENUM('Seller', 'Buyer');--> statement-breakpoint
 CREATE TABLE "account" (
@@ -12,6 +13,21 @@ CREATE TABLE "account" (
 	"scope" text,
 	"id_token" text,
 	"session_state" text
+);
+--> statement-breakpoint
+CREATE TABLE "addresses" (
+	"id" text PRIMARY KEY NOT NULL,
+	"userId" text,
+	"recipient_name" text NOT NULL,
+	"lane1" text NOT NULL,
+	"lane2" text,
+	"landmark" text,
+	"city" text NOT NULL,
+	"state" text NOT NULL,
+	"postal_code" text NOT NULL,
+	"country" text NOT NULL,
+	"address_type" "address_type" NOT NULL,
+	"other_address_type" text
 );
 --> statement-breakpoint
 CREATE TABLE "authenticator" (
@@ -61,9 +77,11 @@ CREATE TABLE "products" (
 	"store_id" text NOT NULL,
 	"name" text NOT NULL,
 	"description" text,
+	"slug" text NOT NULL,
 	"status" "product_status" DEFAULT 'draft' NOT NULL,
 	"cretaed_at" timestamp DEFAULT now() NOT NULL,
-	"updatedAt" timestamp DEFAULT now() NOT NULL
+	"updatedAt" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "products_slug_unique" UNIQUE("slug")
 );
 --> statement-breakpoint
 CREATE TABLE "products_to_categories" (
@@ -76,17 +94,14 @@ CREATE TABLE "sellers" (
 	"id" text PRIMARY KEY NOT NULL,
 	"userId" text NOT NULL,
 	"business_name" text NOT NULL,
+	"phone_number" integer NOT NULL,
 	"stripe_account_id" text,
 	"is_verified" boolean DEFAULT false NOT NULL,
+	"agreed_to_terms" boolean DEFAULT false NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "sellers_phone_number_unique" UNIQUE("phone_number"),
 	CONSTRAINT "sellers_stripe_account_id_unique" UNIQUE("stripe_account_id")
-);
---> statement-breakpoint
-CREATE TABLE "session" (
-	"sessionToken" text PRIMARY KEY NOT NULL,
-	"userId" text NOT NULL,
-	"expires" timestamp NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "stores" (
@@ -129,6 +144,7 @@ CREATE TABLE "verificationToken" (
 );
 --> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "addresses" ADD CONSTRAINT "addresses_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "authenticator" ADD CONSTRAINT "authenticator_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "categories" ADD CONSTRAINT "categories_parent_id_categories_id_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."categories"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "product_to_tags" ADD CONSTRAINT "product_to_tags_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -138,5 +154,4 @@ ALTER TABLE "products" ADD CONSTRAINT "products_store_id_stores_id_fk" FOREIGN K
 ALTER TABLE "products_to_categories" ADD CONSTRAINT "products_to_categories_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "products_to_categories" ADD CONSTRAINT "products_to_categories_category_id_categories_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."categories"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "sellers" ADD CONSTRAINT "sellers_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "session" ADD CONSTRAINT "session_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "stores" ADD CONSTRAINT "stores_seller_id_user_id_fk" FOREIGN KEY ("seller_id") REFERENCES "public"."user"("id") ON DELETE set null ON UPDATE no action;
+ALTER TABLE "stores" ADD CONSTRAINT "stores_seller_id_sellers_id_fk" FOREIGN KEY ("seller_id") REFERENCES "public"."sellers"("id") ON DELETE set null ON UPDATE no action;
