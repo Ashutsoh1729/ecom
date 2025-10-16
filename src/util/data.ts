@@ -1,5 +1,3 @@
-import { ProductCardInterface } from "@/app/test/product-card";
-
 enum AddressType {
   home = "HOME",
   work = "WORK",
@@ -34,41 +32,6 @@ export const linkList: navLink[] = [
   {
     name: "About Us",
     link: "/about",
-  },
-];
-
-export const ProductCardList: ProductCardInterface[] = [
-  {
-    img: "https://placehold.co/600x400/5A67D8/FFFFFF.png?text=Laptop",
-    alt: "A modern silver laptop with the screen open",
-    productName: "NovaBook Pro 15",
-    price: 1499.99,
-    rating: 4.9,
-    category: "Electronics",
-  },
-  {
-    img: "https://placehold.co/600x400/38A169/FFFFFF.png?text=Headphones",
-    alt: "Sleek black over-ear wireless headphones",
-    productName: "AcousticBliss Wireless Headphones",
-    price: 199.5,
-    rating: 4.7,
-    category: "Electronics",
-  },
-  {
-    img: "https://placehold.co/600x400/DD6B20/FFFFFF?text.png=T-Shirt",
-    alt: "A plain white cotton t-shirt on a hanger",
-    productName: "Classic Cotton Crew T-Shirt",
-    price: 24.99,
-    rating: 4.5,
-    category: "Apparel",
-  },
-  {
-    img: "https://placehold.co/600x400/D53F8C/FFFFFF?text.png=Yoga+Mat",
-    alt: "A rolled-up teal eco-friendly yoga mat",
-    productName: "ZenFlow Eco-Friendly Yoga Mat",
-    price: 39.95,
-    rating: 4.8,
-    category: "Sports & Outdoors",
   },
 ];
 
