@@ -10,11 +10,11 @@ import {
 } from "@/components/ui/table";
 import { ChevronsLeft, Dot, Ellipsis, Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { CartItemType } from "@/app/(public)/lib/cart-schema";
 import BagActionSection from "./bag-action";
 import { Button } from "@/components/ui/button";
 import BagQuantityButton from "./quantity-btn";
 import { useCartItems } from "@/app/(public)/components/cart-context";
+import ProductCardForBag from "./shopping-bag-product-card";
 
 const BagSections = () => {
   // Syncing the local cart data with the database
@@ -58,20 +58,35 @@ const BagSections = () => {
           <TableBody>
             {dbCartItems.map((item) => {
               return (
-                <TableRow key={item.variantId}>
-                  <TableCell>{item.productName}</TableCell>
-                  <TableCell className="flex items-center justify-center">
-                    <BagQuantityButton
-                      productId={item.productId}
+                <TableRow key={item.variantId} className="h-fit">
+                  <TableCell>
+                    <ProductCardForBag
+                      name={item.productName}
                       variantId={item.variantId}
-                      currentQuantity={item.quantity}
+                      productId={item.productId}
+                      imgAddr={item.imageUrl}
+                      variantName={item.variantName}
                     />
                   </TableCell>
+                  <TableCell>
+                    <div className="flex items-center justify-center">
+                      <BagQuantityButton
+                        productId={item.productId}
+                        variantId={item.variantId}
+                        currentQuantity={item.quantity}
+                      />
+                    </div>
+                  </TableCell>
                   <TableCell>{item.price}</TableCell>
-                  <TableCell className="flex items-center justify-center">
-                    <Button variant={"ghost"} className="hover:cursor-pointer ">
-                      <Ellipsis />
-                    </Button>
+                  <TableCell>
+                    <div className="flex items-center justify-center">
+                      <Button
+                        variant={"ghost"}
+                        className="hover:cursor-pointer "
+                      >
+                        <Ellipsis />
+                      </Button>
+                    </div>
                   </TableCell>
                   <TableCell className="text-right">
                     {item.quantity * item.price}
