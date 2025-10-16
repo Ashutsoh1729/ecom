@@ -27,6 +27,7 @@ export const addressFormSchema = z
         message: "Address Lane 2 cannot be more than 100 characters.",
       })
       // 3. Handle optional fields that could be empty strings
+      .nullable()
       .optional(),
 
     landmark: z
@@ -35,6 +36,7 @@ export const addressFormSchema = z
       .max(100, {
         message: "Address Lane 2 cannot be more than 100 characters.",
       })
+      .nullable()
       .optional(),
     // 3. Handle optional fields that could be empty strings
     city: z.string().trim().nonempty({ message: "City is required." }),
@@ -59,7 +61,7 @@ export const addressFormSchema = z
 
     // NEW: The field for custom input when 'Other' is selected.
     // This is optional by default. We will make it required conditionally.
-    otherAddressType: z.string().trim().optional(),
+    otherAddressType: z.string().trim().optional().nullable(),
   })
   .superRefine((data, ctx) => {
     if (data.addressType === "Other") {

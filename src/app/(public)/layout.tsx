@@ -5,25 +5,33 @@ import { getAllProduct } from "@/lib/data/products";
 import { getUserRole } from "@/lib/logic";
 import { SessionProvider } from "next-auth/react";
 import { AllProductProvider } from "./components/context";
+import { getCartFromDB } from "@/actions/(public)/user";
+import { DbCartItemsProvider } from "./components/cart-context";
 
 const PublicLayout = async ({ children }: { children: React.ReactNode }) => {
   const userRole = await getUserRole();
   const allProductData = await getAllProduct();
+  const dbCartItems = await getCartFromDB();
   // allProductData is reaching to this point
 
   return (
-    <div>
-      <ModalManager />
-      <AllProductProvider value={allProductData}>
-        <SessionProvider>
-          <Navbar userRole={userRole} />
-        </SessionProvider>
-        {/* <Navbar2 /> */}
-        <Breadcrumb />
+    <SessionProvider>
+      {" "}
+      <div className="h-full">
+        <ModalManager />
+        <AllProductProvider value={allProductData}>
+          <DbCartItemsProvider value={dbCartItems}>
+            <SessionProvider>
+              <Navbar userRole={userRole} />
+            </SessionProvider>
+            {/* <Navbar2 /> */}
+            <Breadcrumb />
 
-        {children}
-      </AllProductProvider>
-    </div>
+            {children}
+          </DbCartItemsProvider>
+        </AllProductProvider>
+      </div>
+    </SessionProvider>
   );
 };
 

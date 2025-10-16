@@ -91,7 +91,6 @@ const ProductSections = () => {
   };
 
   const productList = processedProductList(allStoreData);
-  // TODO: Passing the product data in correct format
   /* 
   const productList = allStoreData.flatMap((store) => {
 	return store.products;

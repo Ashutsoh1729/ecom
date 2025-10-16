@@ -1,5 +1,6 @@
 "use client";
 
+import { deleteAddress } from "@/actions/(public)/user";
 import { AddressFormType } from "@/components/modals/address-modal";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +13,7 @@ import {
 import { Address } from "@/util/data";
 import { useModalStore } from "@/util/states/modal";
 import { Trash } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const AddressCard = ({
   address,
@@ -100,12 +102,11 @@ interface Address_2_Interface {
 
 export function Address_2({ data }: Address_2_Interface) {
   const { openModal } = useModalStore();
+  const router = useRouter();
   const handleAddNew = () => {
     console.log("A new address will be added");
     openModal("addressCreating");
   };
-
-  // TODO: Creating the card to show the address
 
   if (!data) {
     return (
@@ -136,7 +137,13 @@ export function Address_2({ data }: Address_2_Interface) {
 
   const address = data;
   const handleCardDelete = async () => {
-    console.log("you want to delete the card");
+    try {
+      deleteAddress(address.id);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      router.refresh();
+    }
   };
   return (
     <Card className="p-0">

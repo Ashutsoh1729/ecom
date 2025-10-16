@@ -6,12 +6,13 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import AvatarIcon from "../../app/components/avatar-icon";
 import { Heart, ShoppingBag } from "lucide-react";
-import { useCartStore } from "@/app/(public)/lib/cart-schema";
+import { useCartItems } from "@/app/(public)/components/cart-context";
 
 const Navbar = ({ userRole }: { userRole: "Buyer" | "Seller" }) => {
   const router = useRouter();
   const { data: session } = useSession();
-  const { items } = useCartStore();
+  const dbCartItems = useCartItems();
+  const cartLength = dbCartItems.length;
 
   const handleSignIn = () => {
     router.push("/auth/sign-in");
@@ -56,7 +57,7 @@ const Navbar = ({ userRole }: { userRole: "Buyer" | "Seller" }) => {
                 }}
               />
               <span className="top-[-6px] right-[-10px] px-[6px] py-[2px] absolute bg-black flex items-center justify-center  rounded-full text-white text-[10px] font-medium">
-                {items.length}
+                {cartLength}
               </span>
             </div>
           </div>

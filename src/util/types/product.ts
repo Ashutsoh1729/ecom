@@ -44,8 +44,6 @@ export const variantsFormSchema = z.object({
   quantity: z.coerce.number(),
 });
 
-// TODO: Will add a feature to show error while trying to give invalid number data by using differernt input and output types which will show error on ui if string is given and also parse the string inputs to number
-
 // const variantFormForInput = variantsFormSchema.partial().extend()
 
 export const categoriesFormSchema = z.object({

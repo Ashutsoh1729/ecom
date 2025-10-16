@@ -1,16 +1,10 @@
 "use client";
 
-import { useCartStore } from "@/app/(public)/lib/cart-schema";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
-const BagActionSection = () => {
-  const { items, clearCart } = useCartStore();
+const BagActionSection = ({ total }: { total: number }) => {
   const router = useRouter();
-  const totalPriceArray = items.map((item) => item.quantity * item.price);
-  const totalPrice = totalPriceArray.reduce((accumulator, currentValue) => {
-    return accumulator + currentValue;
-  }, 0); // 0 to set the starting point as first item
 
   const handleCheckout = () => {
     try {
@@ -23,14 +17,14 @@ const BagActionSection = () => {
   };
 
   return (
-    <div className="w-full h-full grid grid-cols-1 md:grid-cols-2">
-      <div>Have a coupon?</div>
-      <div>
-        <div>Cart Summery</div>
+    <div className="w-full h-full grid grid-cols-1 md:grid-cols-3 pb-24">
+      <div className="md:col-span-2">Have a coupon?</div>
+      <div className="space-y-4 border border-slate-300 p-2 rounded-md md:col-span-1">
+        <div className="text-gray-700 ">Cart Summery</div>
         <div>{/* Here i will add the selection options*/}</div>
-        <div className="flex justify-between items-center pr-24">
-          <span className="text-xl">Total</span>
-          <span className="text-xl">{totalPrice}</span>
+        <div className="flex justify-between items-center">
+          <span className="text-lg font-medium">Total</span>
+          <span className="text-lg font-medium">{total}</span>
         </div>
         <Button
           className="w-full mt-4 hover:cursor-pointer"

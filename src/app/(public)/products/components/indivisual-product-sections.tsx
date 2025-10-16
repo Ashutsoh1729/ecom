@@ -5,15 +5,15 @@ import { useAllProducts } from "../../components/context";
 import Image from "next/image";
 import ProductVariantSelection, { selectedVariants } from "./variant-selection";
 import { useState } from "react";
-import { useCartStore } from "../../lib/cart-schema";
+import { useRouter } from "next/navigation";
+import { addCartItem } from "@/actions/(public)/cart";
 
 //  NOTE: Now all we just need to do is add the product to the user cart
 
 const IndivisualProductPageSections = ({ slug }: { slug: string }) => {
   const allProducts = useAllProducts();
   const currentProductsList = allProducts?.filter((item) => item.slug === slug);
-  const { addItem } = useCartStore();
-  const variantList = localStorage.getItem("shopping_bag_items");
+  const router = useRouter();
   // console.log(variantList);
 
   const [variants, setVariants] = useState<selectedVariants[] | []>([]);
@@ -63,15 +63,13 @@ const IndivisualProductPageSections = ({ slug }: { slug: string }) => {
     }
   };
 
-  const handleCart = (variants: selectedVariants[]) => {
+  const handleAddToCart = (variants: selectedVariants[]) => {
     // Initially the quantity is 1, and you can increase in your shopping bag
     try {
-      /* if (variantList === null) {
-        localStorage.setItem("shopping_bag_items", `${[]}`);
-      }
-      const shoppingBagItems = localStorage.getItem("shopping_bag_items"); */
-
-      variants.forEach((item) => addItem({ ...item, quantity: 1 }));
+      variants.forEach((item) => {
+        addCartItem(item.productId, item.variantId, 1);
+      });
+      router.push("/shopping-bag");
     } catch (err) {
       console.error(err);
     } finally {
@@ -119,7 +117,7 @@ const IndivisualProductPageSections = ({ slug }: { slug: string }) => {
 
             <Button
               className="w-full md:py-6 hover:cursor-pointer"
-              onClick={() => handleCart(variants)}
+              onClick={() => handleAddToCart(variants)}
             >
               Add to Cart
             </Button>

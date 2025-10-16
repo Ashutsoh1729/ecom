@@ -7,6 +7,8 @@ import {
   integer,
   pgEnum,
   AnyPgColumn,
+  numeric,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "@auth/core/adapters";
 import { relations } from "drizzle-orm";
@@ -367,11 +369,141 @@ export const addressRelations = relations(addresses, ({ one }) => {
   };
 });
 
+/**
+ * The 'cart' table stores the active shopping cart for a user (one-to-one).
+ */
+export const cart = pgTable("cart", {
+  id: text("id")
+    .notNull()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  // Foreign key to the user table, ensuring one cart per user
+  userId: text("user_id")
+    .notNull()
+    .unique()
+    .references(() => users.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const cartRelations = relations(cart, ({ one, many }) => ({
+  user: one(users, {
+    fields: [cart.userId],
+    references: [users.id],
+  }),
+  items: many(cartItems),
+}));
+
+export const cartItems = pgTable(
+  "cart_items",
+  {
+    id: text("id")
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    // Link back to the parent cart
+    cartId: text("cart_id")
+      .notNull()
+      .references(() => cart.id, { onDelete: "cascade" }),
+    // Reference the product/variant being added
+    productId: text("product_id")
+      .notNull()
+      .references(() => products.id),
+    variantId: text("variant_id")
+      .notNull()
+      .references(() => productVariants.id),
+    quantity: integer("quantity").notNull().default(1),
+    addedAt: timestamp("added_at").defaultNow().notNull(),
+  },
+  (t) => [
+    uniqueIndex("cart_product_variant_unique").on(
+      t.variantId,
+      t.productId,
+      t.cartId,
+    ),
+  ],
+);
+
+export const cartItemsRelations = relations(cartItems, ({ one }) => ({
+  cart: one(cart, {
+    fields: [cartItems.cartId],
+    references: [cart.id],
+  }),
+  products: one(products, {
+    fields: [cartItems.productId],
+    references: [products.id],
+  }),
+  variants: one(productVariants, {
+    fields: [cartItems.variantId],
+    references: [productVariants.id],
+  }),
+}));
+
+// -- Order Table --
+// Info needed:
+//
+
+export const orderStatus = pgEnum("order_status", [
+  "PENDING",
+  "PROCESSING",
+  "SHIPPED",
+  "DELIVERED",
+]);
+
+export const orders = pgTable("orders", {
+  id: text("id")
+    .primaryKey()
+    .notNull()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  status: orderStatus("status").default("PENDING").notNull(),
+  totalAmount: numeric("total_amount", { scale: 2, precision: 10 })
+    .notNull()
+    .$type<number>(),
+  shippingAddressId: text("shipping_address_id")
+    .notNull()
+    .references(() => addresses.id),
+  orderDate: timestamp("order_date").defaultNow().notNull(),
+});
+
+export const orderRelations = relations(orders, ({ one, many }) => ({
+  address: one(addresses, {
+    fields: [orders.shippingAddressId],
+    references: [addresses.id],
+  }),
+  items: many(orderItems),
+}));
+
+export const orderItems = pgTable("order_items", {
+  id: text("id")
+    .notNull()
+    .$defaultFn(() => crypto.randomUUID()),
+  orderId: text("order_id")
+    .notNull()
+    .references(() => orders.id, { onDelete: "cascade" }),
+  productId: text("product_id")
+    .notNull()
+    .references(() => products.id),
+  variantId: text("variant_id")
+    .notNull()
+    .references(() => productVariants.id),
+  quantity: integer("quantity").notNull(),
+  // CRITICAL: The price at the time the order was placed. This MUST be saved!
+  priceAtOrder: numeric("price_at_order", {
+    precision: 10,
+    scale: 2,
+  })
+    .notNull()
+    .$type<number>(),
+});
+
 // -- join table --
 //
 //
 
-export const productToTags = pgTable(
+const productToTags = pgTable(
   "product_to_tags",
   {
     productId: text("product_id")

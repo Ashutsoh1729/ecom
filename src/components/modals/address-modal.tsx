@@ -30,6 +30,7 @@ import { Button } from "../ui/button";
 import { useModalStore } from "@/util/states/modal";
 import { addressFormSchema, AddressTypeEnum } from "@/util/types/address";
 import { createAddress } from "@/actions/(public)/user";
+import { useRouter } from "next/navigation";
 
 // Here i will use shadcn ui card to create this form
 export type AddressFormType = z.infer<typeof addressFormSchema>;
@@ -51,6 +52,7 @@ const AddressModal = () => {
       otherAddressType: "",
     },
   });
+  const router = useRouter();
 
   // 2. Watch the 'addressType' field for changes.
   // This will cause the component to re-render whenever the user
@@ -59,9 +61,15 @@ const AddressModal = () => {
   const { closeModal } = useModalStore();
 
   const onSubmit = async (data: AddressFormType) => {
-    console.log(`The address submitted is: `, data);
-    await createAddress(data);
-    closeModal();
+    try {
+      console.log(`The address submitted is: `, data);
+      await createAddress(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      router.refresh();
+      closeModal();
+    }
   };
 
   return (
@@ -111,35 +119,44 @@ const AddressModal = () => {
               <FormField
                 control={form.control}
                 name="lane2"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Lane 2 (Optional)</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="eg. Near Apollo Hospital"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  //  when the value is null, it will replace it with ""
+                  const value = field?.value ?? "";
+                  return (
+                    <FormItem>
+                      <FormLabel>Lane 2 (Optional)</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="eg. Near Apollo Hospital"
+                          {...field}
+                          value={value}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
               {/* Landmark (Optional) */}
               <FormField
                 control={form.control}
                 name="landmark"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Landmark (Optional)</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="eg. Opposite Ispat General Hospital"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  const value = field.value ?? "";
+                  return (
+                    <FormItem>
+                      <FormLabel>Landmark (Optional)</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="eg. Opposite Ispat General Hospital"
+                          {...field}
+                          value={value}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
               {/* City */}
               <FormField
@@ -239,15 +256,22 @@ const AddressModal = () => {
                     <FormField
                       control={form.control}
                       name="otherAddressType"
-                      render={({ field }) => (
-                        <FormItem className="row-span-1">
-                          <FormLabel>Other Address Type</FormLabel>
-                          <FormControl>
-                            <Input placeholder="eg. Friend" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      render={({ field }) => {
+                        const value = field.value ?? "";
+                        return (
+                          <FormItem className="row-span-1">
+                            <FormLabel>Other Address Type</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="eg. Friend"
+                                {...field}
+                                value={value}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        );
+                      }}
                     />
                   )}
                 </div>

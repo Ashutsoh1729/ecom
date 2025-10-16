@@ -1,6 +1,8 @@
 "use client";
 
+import { removeCartItem } from "@/actions/(public)/cart";
 import { useCartStore } from "@/app/(public)/lib/cart-schema";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 
 interface ProductCardForBagInterface {
@@ -18,10 +20,17 @@ const ProductCardForBag = ({
   variantId,
   productId,
 }: ProductCardForBagInterface) => {
+  const { data: session } = useSession();
   const { removeItem } = useCartStore();
 
   const handleRemoveItem = () => {
-    removeItem(productId, variantId);
+    if (session && session?.user && session?.user?.id) {
+      // if user is logged in then change the db cart item state
+      removeCartItem(productId, variantId);
+    } else {
+      // otherwise change the state of the locally stored item data
+      removeItem(productId, variantId);
+    }
   };
 
   return (

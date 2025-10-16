@@ -12,7 +12,6 @@ import { uploadFileToS3 } from "./s3";
 
 // For creating a new product
 
-// TODO: I have to complete the uploading function for the image
 // NOTE: Create product working perfectly fine.
 
 const createProduct = async (data: Out) => {
@@ -62,8 +61,6 @@ const createProduct = async (data: Out) => {
     });
     const finalTagsData = data.tags;
 
-    // TODO: we will first check the data validity
-
     const finalParsedProductData =
       productInsertSchema.safeParse(finalProductData);
 
@@ -85,8 +82,6 @@ const createProduct = async (data: Out) => {
       throw new Error("Final data validation failed at category");
     }
 
-    // TODO: As tags has given optional, we will check first whether there are tags are not, if not, then we will not do db call
-
     let validatedTagsData: z.infer<typeof tagsInsertSchema> | undefined;
 
     // Check if there is raw tag data to process
@@ -107,9 +102,6 @@ const createProduct = async (data: Out) => {
         validatedTagsData = parsedTagsResult.data;
       }
     }
-
-    // TODO: We will try to do one db call and insert multiple data into their respective tables
-    // -- end line
 
     // we will do a db transaction
     await db.transaction(async (tx) => {

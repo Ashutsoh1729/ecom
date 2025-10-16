@@ -18,7 +18,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Switch } from "../ui/switch";
-import createNewStore from "@/actions/(seller)/store-actions";
+import { createNewStore } from "@/actions/(seller)/seller";
 import { useRouter } from "next/navigation";
 // 1. Define the validation schema with Zod based on the 'stores' table
 export const storeFormSchema = z.object({

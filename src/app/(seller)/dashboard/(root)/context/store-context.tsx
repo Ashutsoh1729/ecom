@@ -9,7 +9,6 @@ import { StoreTableDataInterface } from "@/lib/logic";
 import { createContext, ReactNode, useContext } from "react";
 
 // It is going to use provide context to the children components of a layout file
-// TODO: I will combine this storeList and productList and will give all the data from one place, in one go
 
 export type storesList = StoreTableDataInterface[];
 export type allDataListType = getSellerStoreAllDataOutputInterface[];

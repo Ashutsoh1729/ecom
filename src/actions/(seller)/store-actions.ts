@@ -10,9 +10,7 @@ import { createInsertSchema } from "drizzle-zod";
 import z from "zod";
 import { nanoid } from "nanoid";
 
-export default async function createNewStore(
-  data: z.infer<typeof storeFormSchema>,
-) {
+async function createNewStore(data: z.infer<typeof storeFormSchema>) {
   const storeInsertSchema = createInsertSchema(stores);
 
   // check for whether the user exists or not
@@ -64,7 +62,7 @@ export default async function createNewStore(
   }
 }
 
-export async function deleteStore(storeId: string) {
+async function deleteStore(storeId: string) {
   if (!storeId) {
     console.error("Store id is required to delete a store");
     throw new Error("Store id is required for deleting a store");
@@ -72,7 +70,7 @@ export async function deleteStore(storeId: string) {
   await db.delete(stores).where(eq(stores.id, storeId));
 }
 
-export async function updateActiveStatus(storeId: string) {
+async function updateActiveStatus(storeId: string) {
   if (!storeId) {
     console.error("Store id is required to delete a store");
     throw new Error("Store id is required for deleting a store");
@@ -83,3 +81,5 @@ export async function updateActiveStatus(storeId: string) {
     .set({ isActive: sql`not ${stores.isActive}` })
     .where(eq(stores.id, storeId));
 }
+
+export { createNewStore, deleteStore, updateActiveStatus };

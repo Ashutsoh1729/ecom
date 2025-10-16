@@ -1,7 +1,5 @@
 "use client";
 
-//  TODO: Implement the order card item
-
 import Image from "next/image";
 
 interface OrderCardItemProps {
@@ -42,7 +40,9 @@ const OrderCardItem = ({
         <div className="h-full flex flex-col items-end ">
           <div className="mt-auto text-gray-700-500 ">
             Total:
-            <span className="font-medium text-lg ml-[4px]">{price}</span>
+            <span className="font-medium text-lg ml-[4px]">
+              {price * quantity}
+            </span>
           </div>
         </div>
       </div>
