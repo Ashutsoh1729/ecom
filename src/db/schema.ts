@@ -499,6 +499,9 @@ export const orderItems = pgTable("order_items", {
     .$type<number>(),
 });
 
+// -- Like Table -
+// Will add the like option
+
 // -- join table --
 //
 //
