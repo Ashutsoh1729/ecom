@@ -21,6 +21,7 @@ export type productTableColumn = {
   quantity: string;
 };
 
+// Tanstack-Table column
 export const getProductColumns = (
   onDelete: (productId: string, productName: string) => void,
 ): ColumnDef<productTableColumn>[] => [

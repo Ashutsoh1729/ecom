@@ -200,13 +200,13 @@ const AddressModal = () => {
                   </FormItem>
                 )}
               />
-              <div className="flexitems-start  justify-between">
+              <div className="  justify-between flex ">
                 {/* Country */}
                 <FormField
                   control={form.control}
                   name="country"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col gap-3 w-full">
                       <FormLabel>Country</FormLabel>
                       <Select
                         onValueChange={field.onChange}
@@ -233,7 +233,7 @@ const AddressModal = () => {
                     control={form.control}
                     name="addressType"
                     render={({ field }) => (
-                      <FormItem className="row-span-1">
+                      <FormItem className="row-span-1 flex flex-col gap-3">
                         <FormLabel>Address Type</FormLabel>
                         <Select onValueChange={field.onChange}>
                           <FormControl>
@@ -291,7 +291,7 @@ const AddressModal = () => {
                 )}
               />
               <div>
-                <Button className="" type="submit">
+                <Button className="w-full" type="submit">
                   Submit
                 </Button>
               </div>

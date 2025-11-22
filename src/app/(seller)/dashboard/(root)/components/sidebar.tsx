@@ -18,7 +18,7 @@ import { useSession } from "next-auth/react";
 const items = [
   {
     title: "Home",
-    url: "/",
+    url: "/dashboard",
     icon: Home,
   },
   {

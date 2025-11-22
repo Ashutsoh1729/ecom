@@ -1,4 +1,4 @@
-import { neon, Pool } from "@neondatabase/serverless";
+import { Pool } from "@neondatabase/serverless";
 // import { configDotenv } from "dotenv";
 import { drizzle } from "drizzle-orm/neon-serverless";
 import * as schema from "./schema";

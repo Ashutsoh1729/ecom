@@ -128,7 +128,7 @@ const ProductIndivisualPageSections = () => {
                 {/* <p className="text-sm text-gray-500">ID: {product.id}</p> */}
                 <div className="pt-4">
                   <p className="text-[18px] font-medium">Description:</p>
-                  <p className="text-gray-300 text-sm">{product.description}</p>
+                  <p className="text-gray-600 text-sm">{product.description}</p>
                 </div>
                 {/* <p className="text-sm text-gray-500">Slug: {product.slug}</p> */}
               </div>

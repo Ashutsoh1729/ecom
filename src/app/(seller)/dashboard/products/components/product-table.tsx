@@ -71,6 +71,7 @@ const ProductPageTable_2 = <TData extends { slug: string }, TValue>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
+                className="hover:cursor-pointer"
                 onClick={() => {
                   const slug = row.original.slug;
                   router.push(`/dashboard/products/${slug}`);

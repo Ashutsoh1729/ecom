@@ -51,7 +51,7 @@ const Step_1 = ({ storeList }: { storeList: storesList }) => {
   const { setValue } = useFormContext();
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 ">
       <FormField
         name="name"
         render={({ field }) => (
@@ -548,13 +548,13 @@ const CreateProductModal = () => {
 
   return (
     <div>
-      <Card className="py-4 px-4  border-0 outline-none ring-0 focus:ring-0 shadow-none">
+      <Card className="py-2 px-4  border-0 outline-none ring-0 focus:ring-0 shadow-none">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <CardHeader className="px-0">
+            <CardHeader className="px-0 py-3">
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="text-sm font-medium text-slate-500">
+                  <p className="text-sm font-medium text-slate-500 pb-3">
                     Step {step} of {STEPS.length}
                   </p>
                   <CardTitle>{STEPS[step - 1].title}</CardTitle>

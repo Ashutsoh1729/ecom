@@ -11,7 +11,7 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "@auth/core/adapters";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 
 // -- Enum Declaration --
 
@@ -466,6 +466,9 @@ export const orders = pgTable("orders", {
     .notNull()
     .references(() => addresses.id),
   orderDate: timestamp("order_date").defaultNow().notNull(),
+  deliveryDate: timestamp("delivery_date")
+    .default(sql`now() + interval '5 days'`)
+    .notNull(),
 });
 
 export const orderRelations = relations(orders, ({ one, many }) => ({
@@ -498,6 +501,20 @@ export const orderItems = pgTable("order_items", {
     .notNull()
     .$type<number>(),
 });
+
+export const orderItemsToProducts = relations(orderItems, ({ one }) => ({
+  products: one(products, {
+    fields: [orderItems.productId],
+    references: [products.id],
+  }),
+  order: one(orders, {
+    fields: [orderItems.orderId],
+    references: [orders.id],
+  }),
+}));
+
+// OrderItems relations
+// OrderItems -> products, orders, variants
 
 // -- Like Table -
 // Will add the like option

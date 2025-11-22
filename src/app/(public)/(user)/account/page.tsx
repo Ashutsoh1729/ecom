@@ -8,7 +8,62 @@ import SectionHeader from "@/components/page-sections/section-header";
 import { AccountProductList, AddressList } from "@/util/data";
 import { User } from "lucide-react";
 import Image from "next/image";
-import { getUserAddress } from "@/lib/data/users";
+import { getUserAddress, getUsersOrders } from "@/lib/data/users";
+import Link from "next/link";
+
+type OrderQueryResult = {
+  status: string;
+  deliveryDate: Date;
+  address: {
+    state: string;
+    city: string;
+    recipientName: string;
+  };
+  items: {
+    products: {
+      name: string;
+      slug: string;
+      mainImageUrl: string;
+      variants: {
+        sku: string;
+        price: number;
+      }[];
+    };
+  }[];
+};
+
+type OrderItemDisplay = {
+  recipientName: string;
+  productName: string;
+  productImage: string;
+  productPrice: number | null;
+  productSlug: string;
+  productSku: string | null;
+  deliveryDate: Date;
+  deliveryState: string;
+  deliveryStatus: string;
+};
+
+function formatOrders(userOrders: OrderQueryResult[]): OrderItemDisplay[] {
+  return userOrders.flatMap((order) =>
+    order.items.map((item) => {
+      const product = item.products;
+      const variant = product.variants?.[0];
+
+      return {
+        recipientName: order.address.recipientName,
+        productName: product.name,
+        productImage: product.mainImageUrl,
+        productPrice: variant?.price ?? null,
+        productSlug: product.slug,
+        productSku: variant?.sku ?? null,
+        deliveryDate: order.deliveryDate,
+        deliveryState: order.address.state,
+        deliveryStatus: order.status,
+      };
+    }),
+  );
+}
 
 const AccountPage = async () => {
   const session = await auth();
@@ -17,8 +72,14 @@ const AccountPage = async () => {
   const name = session?.user?.name;
   const email = session?.user?.email;
   const userAddrsses = await getUserAddress();
+  const userOrders = await getUsersOrders();
+  const formatedOrders = formatOrders(userOrders);
+  const topFourOrders = formatedOrders.slice(0, 4);
+  console.log(topFourOrders.length);
+  // NOTE: Fix this
+  // 1. Recipient Name, 2. Product Name, 3. Product Image,4. Product Price, 5. Product_slug, 6. Product Sku, 7. delivery Time, 8. delivery state, 9. delivery status
 
-  // console.log(userAddrsses);
+  // TODO: use the above flatternOrderItems to show the ordered items
 
   // TODO: Make the page responsive. Start by building for mobile screen and then move towards for building the desktop.
 
@@ -73,17 +134,28 @@ const AccountPage = async () => {
       </section>
       <section id="account" className="pt-4 pb-20">
         <SectionHeader name="Recent Orders" hasCTA ctaName="View All" />
-        <div
-          id="order-section-container"
-          className="grid grid-cols-2 gap-3 mt-12"
-        >
-          {AccountProductList.map((item, index) => {
-            // console.log(index);
-            return <OrderAccountProductCard {...item} key={index} />;
-          })}
-        </div>
+
+        {topFourOrders.length === 0 && (
+          <Link href={"/"} className="hover:cursor-pointer">
+            <div className="w-full h-[60vh] bg-slate-200 flex items-center justify-center mt-4 rounded-md text-2xl text-slate-700">
+              Buy Some Items First
+            </div>
+          </Link>
+        )}
+
+        {topFourOrders.length != 0 && (
+          <div
+            id="order-section-container"
+            className="grid grid-cols-2 gap-3 mt-12"
+          >
+            {topFourOrders.map((item, index) => {
+              // console.log(index);
+              return <OrderAccountProductCard {...item} key={index} />;
+            })}
+          </div>
+        )}
       </section>
-      <section className="pt-4 pb-20">
+      <section className="pt-4 pb-20 flex flex-col gap-4">
         <SectionHeader name="Address" hasCTA={false} />
         <div
           id="address-container"

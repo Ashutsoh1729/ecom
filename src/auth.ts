@@ -18,6 +18,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // Fetching the most upto date user data from the db
       const existingUser = await db.query.users.findFirst({
         where: eq(users.id, token.sub),
+        with: {
+          seller: true, // Assuming you have relations set up in schema.ts
+        },
       });
 
       // If the user does not exits do nothing
@@ -27,12 +30,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       token.role = existingUser.role;
       // console.log("Token after DB check:", token); // See the token with the fresh role
       //
-      if (existingUser.role === "Seller") {
-        const seller = await db.query.sellers.findFirst({
-          where: eq(sellers.userId, existingUser.id),
-        });
-        const sellerId = seller?.id;
-        token.sellerId = sellerId;
+      if (existingUser.role === "Seller" && existingUser.seller?.id) {
+        token.sellerId = existingUser.seller?.id;
       }
 
       return token;

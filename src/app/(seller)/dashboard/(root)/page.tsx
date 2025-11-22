@@ -11,7 +11,6 @@ const DashboardPage = async () => {
 
   return (
     <div>
-      This is DashboardPage
       <DashboardSections />
     </div>
   );

@@ -1,0 +1,1 @@
+ALTER TABLE "orders" ADD COLUMN "delivery_date" timestamp DEFAULT now() + interval '5 days';

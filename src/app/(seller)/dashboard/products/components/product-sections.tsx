@@ -97,7 +97,7 @@ const ProductSections = () => {
   });
  */
   return (
-    <div className="w-full h-full px-16 pt-12">
+    <div className="w-full h-full px-16 py-4">
       <SectionHeader
         name="Your Products"
         hasCTA

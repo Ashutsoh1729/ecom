@@ -3,13 +3,13 @@
 import { useModalStore } from "@/util/states/modal";
 import { EditProfileModal, LoginModal } from "./text-components";
 import SellerApplicationModal from "../modals/create-seller-modal";
-import { X } from "lucide-react";
-import { Separator } from "../ui/separator";
-import { Button } from "../ui/button";
+// import { X } from "lucide-react";
+// import { Separator } from "../ui/separator";
+// import { Button } from "../ui/button";
 import CreateStoreModal from "../modals/create-store-modal";
 import CreateProductModal from "../modals/create-product-modal";
 import AddressModal from "../modals/address-modal";
-import { getStoreList } from "@/lib/logic";
+// import { getStoreList } from "@/lib/logic";
 
 // A mapping from modal type to the actual component
 const modalComponents = {

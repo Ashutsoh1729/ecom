@@ -3,24 +3,29 @@
 import Image from "next/image";
 
 interface OrderAccountProductCardInterface {
-  productName: string;
-  deliveryCity: string;
-  deliveryStatus: string;
-  deliveryTime: string;
-  productPrice: number;
-  productImage: string;
   recipientName: string;
+  productName: string;
+  productImage: string;
+  productPrice: number | null;
+  productSlug: string;
+  productSku: string | null;
+  deliveryDate: Date;
+  deliveryState: string;
+  deliveryStatus: string;
 }
 
 const OrderAccountProductCard = ({
   productName,
-  deliveryTime,
+  deliveryDate,
   deliveryStatus,
   productImage,
   productPrice,
   recipientName,
-  deliveryCity,
+  deliveryState,
 }: OrderAccountProductCardInterface) => {
+  const date = new Date(deliveryDate);
+  const formatedDate = date.toDateString().slice(4);
+
   return (
     <div
       id="account-produc-card"
@@ -43,11 +48,14 @@ const OrderAccountProductCard = ({
             <span className="bg-slate-400"></span>
           )}
         </div>
-        <div id="product-content" className="flex flex-col justify-between">
+        <div
+          id="product-content"
+          className="flex flex-col justify-between w-full"
+        >
           <div id="top-info" className="font-medium text-gray-600">
             <div id="delivery-status">
               <span>Status:</span>
-              <span>{deliveryStatus}</span>
+              <span> {deliveryStatus}</span>
             </div>
             <div id="delivery-time">
               <span>
@@ -55,22 +63,22 @@ const OrderAccountProductCard = ({
                   ? "Arrived: "
                   : "Arriving: "}
               </span>
-              <span>{deliveryTime}</span>
+              <span>{`${formatedDate}`}</span>
             </div>
           </div>
-          <div id="bottom-info">
+          <div id="bottom-info" className="w-full">
             <div className="flex flex-col">
-              <span className="text-balance text-[16px] font-bold text-black">
+              <span className="text-balance text-[24px] font-bold text-black">
                 {productName}
               </span>
               <span className="font-medium text-gray-600">
                 Delivering to:
                 <span>
-                  {recipientName}, {deliveryCity}
+                  {recipientName}, {deliveryState}
                 </span>
               </span>
             </div>
-            <div className="flex items-end justify-between">
+            <div className="flex w-full items-end justify-between">
               <div className="font-medium">
                 <span className="text-blue-700 hover:text-blue-400 hover:cursor-pointer">
                   Track Package

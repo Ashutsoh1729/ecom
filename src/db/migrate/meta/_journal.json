@@ -64,6 +64,20 @@
       "when": 1760591042994,
       "tag": "0008_calm_ma_gnuci",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1762668933414,
+      "tag": "0009_worthless_power_pack",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1762669043732,
+      "tag": "0010_lazy_mandarin",
+      "breakpoints": true
     }
   ]
 }

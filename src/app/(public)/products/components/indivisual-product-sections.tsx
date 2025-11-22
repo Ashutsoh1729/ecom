@@ -69,7 +69,7 @@ const IndivisualProductPageSections = ({ slug }: { slug: string }) => {
       variants.forEach((item) => {
         addCartItem(item.productId, item.variantId, 1);
       });
-      router.push("/shopping-bag");
+      // router.push("/shopping-bag");
     } catch (err) {
       console.error(err);
     } finally {

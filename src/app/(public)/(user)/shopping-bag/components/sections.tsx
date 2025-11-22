@@ -1,20 +1,11 @@
 "use client";
 import SectionHeader from "@/components/page-sections/section-header";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { ChevronsLeft, Dot, Ellipsis, Menu } from "lucide-react";
+import { ChevronsLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import BagActionSection from "./bag-action";
-import { Button } from "@/components/ui/button";
-import BagQuantityButton from "./quantity-btn";
 import { useCartItems } from "@/app/(public)/components/cart-context";
-import ProductCardForBag from "./shopping-bag-product-card";
+import ShoppingBagTable from "./bag-table";
+import Link from "next/link";
 
 const BagSections = () => {
   // Syncing the local cart data with the database
@@ -42,62 +33,21 @@ const BagSections = () => {
         iconType="leading"
         buttonAction={handleFirstHeaderAction}
       />
-
-      <div id="bag-table" className="mt-12 space-y-4">
-        <Table>
-          {/* <TableCaption>Table of your cart product</TableCaption> */}
-          <TableHeader>
-            <TableRow>
-              <TableHead>Product</TableHead>
-              <TableHead className="text-center">Quantity</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead className="text-center">Edit</TableHead>
-              <TableHead className="text-right">Total</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {dbCartItems.map((item) => {
-              return (
-                <TableRow key={item.variantId} className="h-fit">
-                  <TableCell>
-                    <ProductCardForBag
-                      name={item.productName}
-                      variantId={item.variantId}
-                      productId={item.productId}
-                      imgAddr={item.imageUrl}
-                      variantName={item.variantName}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center justify-center">
-                      <BagQuantityButton
-                        productId={item.productId}
-                        variantId={item.variantId}
-                        currentQuantity={item.quantity}
-                      />
-                    </div>
-                  </TableCell>
-                  <TableCell>{item.price}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center justify-center">
-                      <Button
-                        variant={"ghost"}
-                        className="hover:cursor-pointer "
-                      >
-                        <Ellipsis />
-                      </Button>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {item.quantity * item.price}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-        <BagActionSection total={total} />
-      </div>
+      {dbCartItems.length > 0 ? (
+        <div>
+          <ShoppingBagTable />
+          <div id="bag-table" className="mt-12 space-y-4">
+            <BagActionSection total={total} />
+          </div>
+        </div>
+      ) : (
+        <Link href={"/"}>
+          <div className="w-full h-[60vh] bg-slate-100 flex justify-center items-center text-2xl font-medium text-slate-600 mt-6 rounded-md">
+            {" "}
+            Please Add items to your cart first
+          </div>
+        </Link>
+      )}
     </div>
   );
 };

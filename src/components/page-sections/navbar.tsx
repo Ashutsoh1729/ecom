@@ -47,11 +47,10 @@ const Navbar = ({ userRole }: { userRole: "Buyer" | "Seller" }) => {
                 // router.push("/likes");
               }}
             />
-            <div className="relative flex items-center">
+            <div className="relative flex items-center hover:cursor-pointer">
               <ShoppingBag
                 size={28}
                 strokeWidth={1.5}
-                className="hover:cursor-pointer"
                 onClick={() => {
                   router.push("/shopping-bag");
                 }}

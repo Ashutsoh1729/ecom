@@ -52,7 +52,7 @@ const StoreSections = () => {
   });
 
   return (
-    <div className="w-full h-full px-16 pt-12">
+    <div className="w-full h-full px-16 pt-4">
       <SectionHeader
         name="Your Stores"
         hasCTA
@@ -62,7 +62,7 @@ const StoreSections = () => {
         iconType="leading"
         IconComponent={PlusIcon}
         buttonAction={() => {
-          openModal("productCreating");
+          openModal("storeCreating");
         }}
       />
       {/* <StoreTable /> */}
