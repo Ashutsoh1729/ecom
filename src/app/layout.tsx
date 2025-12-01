@@ -37,6 +37,35 @@ export default async function RootLayout({
   // If you find the user as seller, send him directly to the dashboard
   return (
     <html lang="en">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              var initOpts = {
+                projectKey: "BrLftvYDIrikjebtG0WR",
+                ingestPoint: "https://sonarly.dev/ingest",
+                __DISABLE_SECURE_MODE: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+              };
+              var startOpts = {};
+              
+              (function(A,s,a,y,e,r){
+                r=window.Sonarly=[e,r,y,[s-1, e]];
+                s=document.createElement('script');s.src=A;s.async=!a;
+                document.getElementsByTagName('head')[0].appendChild(s);
+                r.start=function(v){r.push([0])};
+                r.stop=function(v){r.push([1])};
+                r.setUserID=function(id){r.push([2,id])};
+                r.setUserAnonymousID=function(id){r.push([3,id])};
+                r.setMetadata=function(k,v){r.push([4,k,v])};
+                r.event=function(k,p,i){r.push([5,k,p,i])};
+                r.issue=function(k,p){r.push([6,k,p])};
+                r.isActive=function(){return false};
+                r.getSessionToken=function(){};
+              })("https://sonarly.dev/static/tracker.js",1,0,initOpts,startOpts);
+            `,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${fontAlkatra.variable} ${interSans.variable} antialiased`}
       >
