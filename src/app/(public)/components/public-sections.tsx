@@ -37,6 +37,7 @@ const PublicProductPageSections = () => {
                 key={item.name}
                 img={item.mainImageUrl}
                 productName={item.name}
+                productId={item.id}
                 alt={item.name}
                 price={lowest_price}
                 slug={item.slug}

@@ -9,9 +9,11 @@ import {
   AnyPgColumn,
   numeric,
   uniqueIndex,
+  customType,
+  index,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "@auth/core/adapters";
-import { relations, sql } from "drizzle-orm";
+import { relations, SQL, sql } from "drizzle-orm";
 
 // -- Enum Declaration --
 
@@ -38,6 +40,7 @@ export const usersRelations = relations(users, ({ one, many }) => {
     // Drizzle infers the relationship from the foreign key on the 'sellers' table.
     // You don't need to specify fields/references here.
     seller: one(sellers),
+    wishlists: one(wishlists),
   };
 });
 
@@ -196,28 +199,50 @@ export const productStatus = pgEnum("product_status", [
   "archived",
 ]);
 
-export const products = pgTable("products", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  // linking back to store id
-  storeId: text("store_id")
-    .notNull()
-    .references(() => stores.id, { onDelete: "cascade" }),
-  name: text("name").notNull().unique(),
-  description: text("description"),
-  slug: text("slug").notNull().unique(),
-
-  // store image url here
-  mainImageUrl: text("main_img").notNull().unique(),
-
-  status: productStatus("status").default("draft").notNull(),
-
-  // timestamps
-
-  createdAt: timestamp("cretaed_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+export const tsvector = customType<{
+  data: string;
+}>({
+  dataType() {
+    return `tsvector`;
+  },
 });
+
+export const products = pgTable(
+  "products",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    // linking back to store id
+    storeId: text("store_id")
+      .notNull()
+      .references(() => stores.id, { onDelete: "cascade" }),
+    name: text("name").notNull().unique(),
+    description: text("description"),
+
+    // adding auto generated columns, for search functionalities
+    productSearch: tsvector("search_vector")
+      .notNull()
+      .generatedAlwaysAs(
+        (): SQL =>
+          sql`to_tsvector('english', ${products.name} || ' ' || coalesce(${products.description}, ''))`,
+      ),
+    slug: text("slug").notNull().unique(),
+
+    // store image url here
+    mainImageUrl: text("main_img").notNull().unique(),
+
+    status: productStatus("status").default("draft").notNull(),
+
+    // timestamps
+
+    createdAt: timestamp("cretaed_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+
+  // for search functionalities
+  (t) => [index("idx_product_search").using("gin", t.productSearch)],
+);
 
 // -- defining relations
 export const productsRelations = relations(products, ({ many, one }) => {
@@ -232,6 +257,7 @@ export const productsRelations = relations(products, ({ many, one }) => {
 
     // Many-to-many: For linking products to tags
     productToTags: many(productToTags),
+    productToWishlistItems: one(wishlistsItems),
   };
 });
 
@@ -518,6 +544,63 @@ export const orderItemsToProducts = relations(orderItems, ({ one }) => ({
 
 // -- Like Table -
 // Will add the like option
+
+export const wishlists = pgTable("wishlists", {
+  id: text("id")
+    .notNull()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  // Foreign key to the user table, ensuring one cart per user
+  userId: text("user_id")
+    .notNull()
+    .unique()
+    .references(() => users.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// wishlists relations
+export const wishlistsRelations = relations(wishlists, ({ one, many }) => ({
+  user: one(users, {
+    fields: [wishlists.userId],
+    references: [users.id],
+  }),
+  wishlistItems: many(wishlistsItems),
+}));
+
+export const wishlistsItems = pgTable(
+  "wishlists_items",
+  {
+    id: text("id")
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    // Link back to the parent cart
+    wishlistsId: text("wishlists_id")
+      .notNull()
+      .references(() => wishlists.id, { onDelete: "cascade" }),
+    // Reference the product/variant being added
+    productId: text("product_id")
+      .notNull()
+      .references(() => products.id),
+    addedAt: timestamp("added_at").defaultNow().notNull(),
+  },
+  (t) => [
+    uniqueIndex("uniqueWishlistAndProduct").on(t.wishlistsId, t.productId),
+  ],
+);
+
+// wishlistsItems relations
+export const wishlistsItemsRelations = relations(wishlistsItems, ({ one }) => ({
+  wishlists: one(wishlists, {
+    fields: [wishlistsItems.wishlistsId],
+    references: [wishlists.id],
+  }),
+  products: one(products, {
+    fields: [wishlistsItems.productId],
+    references: [products.id],
+  }),
+}));
 
 // -- join table --
 //

@@ -7,11 +7,15 @@ import { useSession } from "next-auth/react";
 import AvatarIcon from "../../app/components/avatar-icon";
 import { Heart, ShoppingBag } from "lucide-react";
 import { useCartItems } from "@/app/(public)/components/cart-context";
+import { PublicSearchBar } from "./public_search_bar";
 
 const Navbar = ({ userRole }: { userRole: "Buyer" | "Seller" }) => {
   const router = useRouter();
   const { data: session } = useSession();
   const dbCartItems = useCartItems();
+
+  //  FIX: The cart items don't get updated when the cart items are added, becoz the dbCartItems needed to be extracted once more time, we have to create an central data provider for the cart items
+
   const cartLength = dbCartItems.length;
 
   const handleSignIn = () => {
@@ -27,26 +31,19 @@ const Navbar = ({ userRole }: { userRole: "Buyer" | "Seller" }) => {
           </Link>
         </div>
         <div className="flex items-center gap-8 lg:h-10">
-          {/* <div id="nav-searchbar" className="h-full flex">
-            <Input className="outline-none focus:outline-none focus-visible:ring-0 "></Input>
-            <span className="bg-black flex gap-1 text-white text-xl items-center px-3 rounded-md">
-              <Image
-                src={"/command.svg"}
-                alt="command key"
-                width={30}
-                height={30}
-              />
-              K </span>
-          </div> */}
+          <div className="w-[400px]">
+            <PublicSearchBar />
+          </div>
           <div id="nav-icons" className="flex items-center h-full gap-4  ">
             <Heart
               size={28}
               strokeWidth={1.5}
               className="hover:cursor-pointer"
               onClick={() => {
-                // router.push("/likes");
+                router.push("/wishlist");
               }}
             />
+
             <div className="relative flex items-center hover:cursor-pointer">
               <ShoppingBag
                 size={28}
@@ -60,6 +57,7 @@ const Navbar = ({ userRole }: { userRole: "Buyer" | "Seller" }) => {
               </span>
             </div>
           </div>
+
           <div id="nav-action" className="flex items-center ">
             {session?.user ? (
               <AvatarIcon

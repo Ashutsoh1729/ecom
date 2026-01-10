@@ -74,6 +74,7 @@ const IndivisualProductPageSections = ({ slug }: { slug: string }) => {
       console.error(err);
     } finally {
       setVariants([]);
+      router.refresh();
     }
   };
 

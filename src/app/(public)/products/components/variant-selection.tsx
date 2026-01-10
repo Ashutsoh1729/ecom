@@ -38,7 +38,7 @@ const ProductVariantSelection = ({
       {currentProduct.variants.map((variant, index) => (
         <div
           key={index}
-          className="flex items-center justify-between p-4 bg-gray-100 border border-gray-200 rounded-lg"
+          className="flex items-center hover:cursor-pointer justify-between p-4 bg-gray-100 border border-gray-200 rounded-lg"
           onClick={() =>
             handleSelect(
               currentProduct.id,

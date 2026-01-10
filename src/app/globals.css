@@ -146,4 +146,9 @@
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.439 0 0);
   }
+
+  /* Giving the button a cursor pointer on hover*/
+  button:hover {
+    cursor: pointer;
+  }
 }

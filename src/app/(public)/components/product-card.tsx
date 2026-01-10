@@ -16,6 +16,7 @@ export interface ProductCardInterface {
   img: string;
   alt: string;
   productName: string;
+  productId: string;
   slug: string;
   price: number;
   rating?: number;
@@ -93,6 +94,7 @@ const ProductCard_2 = ({
   img,
   slug,
   productName,
+  productId,
   alt,
   price,
 }: ProductCardInterface) => {
@@ -102,7 +104,7 @@ const ProductCard_2 = ({
       <Card className="gap-0 p-4 hover:cursor-pointer">
         <CardContent className="p-0 relative">
           <div className="absolute z-30 right-0 top-0 mr-2 mt-2">
-            <LikeButton slug={slug} productName={productName} />
+            <LikeButton productId={productId} productName={productName} />
           </div>
           <Image
             src={img}

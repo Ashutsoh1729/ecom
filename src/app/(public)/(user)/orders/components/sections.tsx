@@ -14,6 +14,7 @@ import { useSession } from "next-auth/react";
 import { useModalStore } from "@/util/states/modal";
 import { Separator } from "@/components/ui/separator";
 import { placeOrder } from "@/actions/(public)/order";
+import SectionHeader from "@/components/page-sections/section-header";
 
 const OrderSections = () => {
   const dbCartItem = useCartItems();
@@ -23,7 +24,7 @@ const OrderSections = () => {
     0,
   );
   const address = useAddresses();
-  console.log(address);
+  // console.log("The address is", address);
   const router = useRouter();
 
   if (address === null) {
@@ -53,6 +54,10 @@ const OrderSections = () => {
     if (session && session.user.id) {
       // proceed to place an order if the user exists
       // then check for the addressId
+      if (selectedAddress === undefined) {
+        toast.warning("First add an shipping address.");
+      }
+
       if (selectedAddress?.id) {
         try {
           const orderId = await placeOrder({
@@ -73,59 +78,61 @@ const OrderSections = () => {
   };
 
   return (
-    <div
-      id="order-container"
-      className="w-full h-full px-16 pt-24 grid grid-cols-1 md:grid-cols-2 pb-24 gap-4"
-    >
-      <div id="shopping-details" className="col-span-1">
-        <span className="text-xl">Shopping Details</span>
-        <Separator className="mt-2 " />
-        <div className="pr-4 flex flex-col gap-3 mt-2">
-          <div>
-            {selectedAddress != null ? (
-              <OrderAddressCard address={selectedAddress} />
-            ) : (
-              <Button onClick={handleAddAddress}>Add an Address</Button>
-            )}
+    <div id="order-container" className="flex flex-col mt-24 px-16 pb-24">
+      <SectionHeader name="Order Now" buttonVariant="outline" hasCTA={false} />
+      <div className="w-full h-full mt-8  grid grid-cols-1 md:grid-cols-2  gap-4">
+        <div id="shopping-details" className="col-span-1">
+          <span className="text-xl">Shopping Details</span>
+          <Separator className="mt-4 " />
+          <div className="pr-4 flex flex-col gap-3 mt-2">
+            <div className="mt-4 w-full">
+              {selectedAddress != null ? (
+                <OrderAddressCard address={selectedAddress} />
+              ) : (
+                <Button onClick={handleAddAddress} className="w-full">
+                  Add an Address
+                </Button>
+              )}
+            </div>
+            {/* <Button
+			variant={"outline"}
+			onClick={handleChangeAddress}
+			className="border-black"
+		  >
+			Change Address
+		  </Button> */}
           </div>
-          {/* <Button
-            variant={"outline"}
-            onClick={handleChangeAddress}
-            className="border-black"
-          >
-            Change Address
-          </Button> */}
         </div>
-      </div>
-      <div id="order-items" className="w-full col-span-1">
-        <span className="text-xl">Order Items</span>
-        <div>
-          {dbCartItem.map((item) => {
-            return (
-              <OrderCardItem
-                key={item.variantId}
-                imageUrl={item.imageUrl}
-                productName={item.productName}
-                variantName={item.variantName}
-                variantId={item.variantId}
-                productId={item.productId}
-                quantity={item.quantity}
-                price={item.price}
-              />
-            );
-          })}
-        </div>
+        <div id="order-items" className="w-full col-span-1 ">
+          <span className="text-xl">Order Items</span>
+          <div className="mt-2">
+            {dbCartItem.map((item) => {
+              return (
+                <OrderCardItem
+                  key={item.variantId}
+                  imageUrl={item.imageUrl}
+                  productName={item.productName}
+                  variantName={item.variantName}
+                  variantId={item.variantId}
+                  productId={item.productId}
+                  quantity={item.quantity}
+                  price={item.price}
+                />
+              );
+            })}
+          </div>
 
-        <div className="w-full flex justify-between items-center mt-3 pt-6 border-slate-400 border-dashed mb-4 border-t-2">
-          <span className="text-lg ">Total Bill:</span>
-          <span className="text-xl font-semibold">{totalBillAmount}</span>
+          <div className="w-full flex justify-between items-center mt-3 pt-6 border-slate-400 border-dashed mb-4 border-t-2">
+            <span className="text-lg ">Total Bill:</span>
+            <span className="text-xl font-semibold">{totalBillAmount}</span>
+          </div>
+          <Button
+            onClick={handlePlaceOrder}
+            className="w-full mt-4 hover:cursor-pointer"
+          >
+            Order
+          </Button>
         </div>
-        <Button
-          onClick={handlePlaceOrder}
-          className="w-full mt-4 hover:cursor-pointer"
-        >
-          Order
-        </Button>
       </div>
     </div>
   );

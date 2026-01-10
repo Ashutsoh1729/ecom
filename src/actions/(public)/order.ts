@@ -7,7 +7,6 @@ import {
   orderItems,
   orders,
   productVariants,
-  users,
 } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";

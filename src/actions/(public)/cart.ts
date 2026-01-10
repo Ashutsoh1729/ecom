@@ -41,7 +41,9 @@ export async function addCartItem(
   const session = await auth();
   if (!session?.user?.id) return;
 
-  // find whther cart exists on this user id
+  //  NOTE: New version is added at the bottom, v1
+
+  /* // find whther cart exists on this user id
   const dbCart = await db.query.cart.findFirst({
     where: eq(cart.userId, session.user.id),
   });
@@ -69,7 +71,53 @@ export async function addCartItem(
     .onConflictDoUpdate({
       target: [cartItems.cartId, cartItems.productId, cartItems.variantId],
       set: { quantity: sql`${cartItems.quantity} + ${quantity}` },
+    }); */
+
+  //  NOTE: v2
+
+  await db.transaction(async (tx) => {
+    // 1. FIND OR CREATE CART 🛒
+    // Find the cart first
+    let dbCart = await tx.query.cart.findFirst({
+      where: eq(cart.userId, session.user.id),
+      columns: {
+        id: true,
+      },
     });
+
+    // If cart doesn't exist, create it.
+    if (!dbCart) {
+      // Note: Use 'tx' for the insertion
+      const [newCart] = await tx
+        .insert(cart)
+        .values({ userId: session.user.id })
+        .returning({ id: cart.id });
+
+      dbCart = newCart;
+    }
+
+    // Guard clause to ensure we have a cart ID
+    if (!dbCart?.id) {
+      throw new Error("Failed to find or create cart ID.");
+    }
+    const cartId = dbCart.id;
+
+    // 2. INSERT OR UPDATE CART ITEM ➕
+    // Use the cartId from the previous step and 'tx' for the operation
+    await tx
+      .insert(cartItems)
+      .values({
+        cartId: cartId,
+        productId: productId,
+        variantId: variantId,
+        quantity: quantity,
+      })
+      // onConflictDoUpdate will handle the logic of "if exists, update quantity"
+      .onConflictDoUpdate({
+        target: [cartItems.cartId, cartItems.productId, cartItems.variantId],
+        set: { quantity: sql`${cartItems.quantity} + ${quantity}` },
+      });
+  });
 }
 
 export async function updateCartItem(

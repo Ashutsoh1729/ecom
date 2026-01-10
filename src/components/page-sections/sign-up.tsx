@@ -2,6 +2,7 @@
 
 import { signIn } from "next-auth/react";
 import Image from "next/image";
+import { FcGoogle } from "react-icons/fc";
 
 export default function SignIn() {
   return (
@@ -22,6 +23,7 @@ export default function SignIn() {
         className="bg-white flex items-center text-black rounded-md px-[24px] gap-3 py-2 font-medium border border-slate-400 hover:cursor-pointer"
         onClick={() => signIn("google", { redirectTo: "/" })}
       >
+        <FcGoogle />
         Google
       </button>
     </div>
