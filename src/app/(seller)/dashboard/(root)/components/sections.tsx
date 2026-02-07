@@ -1,17 +1,29 @@
 "use client";
 
 import SectionHeader from "@/components/page-sections/section-header";
-import DashboardCard from "./dashboard-card";
+import {
+  RevenueCard,
+  TopProductsTable,
+  RecentOrdersList,
+} from "@/components/seller";
 
 const DashboardSections = () => {
   return (
     <div className="px-16 py-4">
       <SectionHeader name={"Dashboard"} hasCTA={false} />
-      <div id="dashboard-container">
-        <div></div>
+
+      {/* Revenue Summary - "How much money am I making?" */}
+      <div className="mt-6">
+        <RevenueCard />
       </div>
-      <div>
-        <DashboardCard name="Ashutosh" />
+
+      {/* Top Products & Recent Orders */}
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        {/* "What's selling well?" */}
+        <TopProductsTable limit={5} />
+
+        {/* "What orders need attention?" */}
+        <RecentOrdersList limit={10} />
       </div>
     </div>
   );
