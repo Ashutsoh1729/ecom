@@ -20,6 +20,7 @@ import { Button } from "../ui/button";
 import { Switch } from "../ui/switch";
 import { createNewStore } from "@/actions/(seller)/seller";
 import { useRouter } from "next/navigation";
+import { useScrollLock } from "@/hooks/use-scroll-lock";
 // 1. Define the validation schema with Zod based on the 'stores' table
 export const storeFormSchema = z.object({
   storeName: z.string().min(3, {
@@ -41,6 +42,12 @@ export const storeFormSchema = z.object({
 });
 const CreateStoreModal = () => {
   const { closeModal } = useModalStore();
+
+  // to stop background from scrolling
+  useScrollLock();
+
+  //  TODO: Stripe Connect Setup
+
   // 2. Set up the form using React Hook Form and the Zod resolver
   const form = useForm<z.infer<typeof storeFormSchema>>({
     resolver: zodResolver(storeFormSchema),

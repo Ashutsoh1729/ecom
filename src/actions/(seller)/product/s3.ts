@@ -3,7 +3,6 @@ import {
   S3Client,
   PutObjectCommand,
   DeleteObjectCommand,
-  type ObjectCannedACL,
 } from "@aws-sdk/client-s3";
 import { nanoid } from "nanoid";
 

@@ -31,6 +31,7 @@ import { useModalStore } from "@/util/states/modal";
 import { addressFormSchema, AddressTypeEnum } from "@/util/types/address";
 import { createAddress } from "@/actions/(public)/user";
 import { useRouter } from "next/navigation";
+import { useScrollLock } from "@/hooks/use-scroll-lock";
 
 // Here i will use shadcn ui card to create this form
 export type AddressFormType = z.infer<typeof addressFormSchema>;
@@ -53,6 +54,9 @@ const AddressModal = () => {
     },
   });
   const router = useRouter();
+
+  // to stop the background scrolling effect
+  useScrollLock();
 
   // 2. Watch the 'addressType' field for changes.
   // This will cause the component to re-render whenever the user

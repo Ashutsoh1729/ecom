@@ -22,6 +22,7 @@ export async function getCartFromDB() {
   });
 
   if (!dbCart) return [];
+
   return dbCart.items.map((i) => ({
     productId: i.productId,
     variantId: i.variantId,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useAllProducts } from "./context";
-import { ProductCard_2 } from "./product-card";
+import { ProductCard_2, ProductCardV3 } from "./product-card";
 
 const PublicProductPageSections = () => {
   const allProductsData = useAllProducts();
@@ -33,7 +33,7 @@ const PublicProductPageSections = () => {
             const variant_prices = item.variants.map((item) => item.price);
             const lowest_price = Math.min(...variant_prices);
             return (
-              <ProductCard_2
+              <ProductCardV3
                 key={item.name}
                 img={item.mainImageUrl}
                 productName={item.name}

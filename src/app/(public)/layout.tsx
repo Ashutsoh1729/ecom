@@ -7,6 +7,7 @@ import { SessionProvider } from "next-auth/react";
 import { AllProductProvider } from "./components/context";
 import { getCartFromDB } from "@/actions/(public)/user";
 import { DbCartItemsProvider } from "./components/cart-context";
+import Footer1 from "@/components/page-sections/footer";
 
 const PublicLayout = async ({ children }: { children: React.ReactNode }) => {
   const userRole = await getUserRole();
@@ -28,6 +29,8 @@ const PublicLayout = async ({ children }: { children: React.ReactNode }) => {
             <Breadcrumb />
 
             {children}
+
+            <Footer1 />
           </DbCartItemsProvider>
         </AllProductProvider>
       </div>

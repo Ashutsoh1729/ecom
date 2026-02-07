@@ -18,6 +18,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useModalStore } from "@/util/states/modal";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useScrollLock } from "@/hooks/use-scroll-lock";
 
 // 1. Define the validation schema with Zod
 export const sellerFormSchema = z.object({
@@ -37,6 +38,9 @@ export const sellerFormSchema = z.object({
 
 const SellerApplicationModal = () => {
   const { closeModal } = useModalStore();
+
+  // to lock the background from scrolling
+  useScrollLock();
 
   // 2. Set up the form using React Hook Form and the Zod resolver
   const form = useForm<z.infer<typeof sellerFormSchema>>({
@@ -78,7 +82,7 @@ const SellerApplicationModal = () => {
   }
 
   return (
-    <div>
+    <div className="px-4 py-4">
       <h2 className="text-2xl font-bold text-gray-800">Become a Seller</h2>
       <p className="mt-2 text-sm text-gray-600">
         Fill out the form below to start selling. All fields are required unless

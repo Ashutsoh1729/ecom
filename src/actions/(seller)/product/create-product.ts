@@ -94,7 +94,7 @@ const createProduct = async (data: Out) => {
         // If it fails, log a specific error and throw.
         console.error(
           "Final data validation failed at tags",
-          parsedTagsResult.error.flatten(), // .flatten() gives cleaner errors
+          parsedTagsResult.error, // .flatten() gives cleaner errors
         );
         throw new Error("Final data validation failed at tags");
       } else {

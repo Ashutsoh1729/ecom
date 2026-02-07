@@ -1,6 +1,9 @@
 "use client";
 
-import { ProductCard_2 } from "@/app/(public)/components/product-card";
+import {
+  ProductCard_2,
+  ProductCardV3,
+} from "@/app/(public)/components/product-card";
 import SectionHeader from "@/components/page-sections/section-header";
 import { ChevronsLeft } from "lucide-react";
 import Link from "next/link";
@@ -64,7 +67,7 @@ const PublicLikeSections = ({ products }: PublicLikeSectionsProps) => {
       <div className="mt-12  grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {products.map((product, index) => {
           return (
-            <ProductCard_2
+            <ProductCardV3
               img={product.img}
               key={index}
               productName={product.name}

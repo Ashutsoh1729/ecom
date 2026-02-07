@@ -3,9 +3,9 @@
 import { cache } from "react";
 import { auth } from "@/auth";
 import { db } from "@/db/client";
-import { stores, users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { redis_client } from "@/util/upstash";
+import { stores } from "@/db/schema/seller";
 
 // The 'cache' function ensures that if this function is called multiple times
 // with the same inputs in a single request, the database is only hit once.

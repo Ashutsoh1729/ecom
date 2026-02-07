@@ -19,7 +19,9 @@ export function LikeButton({ productId, productName }: LikeButtonProps) {
   const [isLiked, setIsLiked] = useState(false);
   // console.log(slug);
 
-  const handleLikeToggle = async () => {
+  const handleLikeToggle = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
     setIsLiked(!isLiked);
 
     if (isLiked === false) {

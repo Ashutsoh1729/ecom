@@ -2,8 +2,8 @@ import NextAuth from "next-auth";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "./db/client";
 import { eq } from "drizzle-orm";
-import { sellers, users } from "./db/schema";
 import authConfig from "./auth.config";
+import { users } from "./db/schema/user";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
@@ -11,7 +11,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
   callbacks: {
     // This callback runs whenever a JWT is created or updated.
-    async jwt({ token, trigger, session }) {
+    async jwt({ token }) {
       // getting the users id
       if (!token.sub) return token; // As token.sub is the userID
 
