@@ -16,28 +16,15 @@ import {
 } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
 
-export type productTableList = {
-  name: string;
-  slug: string;
-  storeName: string;
-  status: "draft" | "active" | "archived";
-  variants: {
-    price: number;
-    quantity: number;
-  }[];
-};
-
-// Here we have used typescript generics to define our type
-
-interface ProductPageTableProps<TData, TValue> {
+interface ModernProductTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-const ProductPageTable_2 = <TData extends { slug: string }, TValue>({
+export const ModernProductTable = <TData extends { slug: string }, TValue>({
   columns,
   data,
-}: ProductPageTableProps<TData, TValue>) => {
+}: ModernProductTableProps<TData, TValue>) => {
   const table = useReactTable({
     data,
     columns,
@@ -47,19 +34,25 @@ const ProductPageTable_2 = <TData extends { slug: string }, TValue>({
   const router = useRouter();
 
   return (
-    <div className="border rounded-md">
+    <div className="rounded-lg border border-border/50 overflow-hidden">
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
+            <TableRow
+              key={headerGroup.id}
+              className="bg-muted/50 hover:bg-muted/50"
+            >
               {headerGroup.headers.map((header) => (
-                <TableHead key={header.id}>
+                <TableHead
+                  key={header.id}
+                  className="font-semibold text-foreground"
+                >
                   {header.isPlaceholder
                     ? null
                     : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
                 </TableHead>
               ))}
             </TableRow>
@@ -71,23 +64,33 @@ const ProductPageTable_2 = <TData extends { slug: string }, TValue>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
-                className="hover:cursor-pointer"
-                onClick={() => {
+                className="transition-colors hover:bg-muted/30 cursor-pointer group"
+                onClick={(e) => {
+                  // Don't navigate if clicking on action buttons
+                  if ((e.target as HTMLElement).closest('[data-no-navigate]')) {
+                    return;
+                  }
                   const slug = row.original.slug;
                   router.push(`/dashboard/products/${slug}`);
                 }}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  <TableCell key={cell.id} className="py-4">
+                    {flexRender(
+                      cell.column.columnDef.cell,
+                      cell.getContext()
+                    )}
                   </TableCell>
                 ))}
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+              <TableCell
+                colSpan={columns.length}
+                className="h-24 text-center text-muted-foreground"
+              >
+                No products found.
               </TableCell>
             </TableRow>
           )}
@@ -97,4 +100,5 @@ const ProductPageTable_2 = <TData extends { slug: string }, TValue>({
   );
 };
 
-export { ProductPageTable_2 };
+// Keep old export for backwards compatibility
+export { ModernProductTable as ProductPageTable_2 };
