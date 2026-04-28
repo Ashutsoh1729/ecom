@@ -4,7 +4,6 @@ import { cache } from "react";
 import { auth } from "@/auth";
 import { db } from "@/db/client";
 import { eq } from "drizzle-orm";
-import { redis_client } from "@/util/upstash";
 import { stores } from "@/db/schema/seller";
 
 // The 'cache' function ensures that if this function is called multiple times
@@ -15,36 +14,19 @@ export const getUserRole = async (): Promise<"Seller" | "Buyer"> => {
 
   if (!userId) return "Buyer";
 
-  const cacheKey = `user:role:${userId}`;
-
   try {
-    // 1. Try Redis
-    const cached = await redis_client.get<{ role: "Seller" | "Buyer" }>(
-      cacheKey,
-    );
-
-    if (cached) {
-      return cached.role;
-    }
-
-    // 2. Fallback to DB (Cache Miss)
     const user = await db.query.users.findFirst({
       where: (users, { eq }) => eq(users.id, userId),
       columns: { role: true },
     });
 
-    // 3. Handle Result & Save to Cache
     if (user) {
-      // ✅ FIXED: Save to Redis so the next request is fast
-      await redis_client.set(cacheKey, user, { ex: 3600 }); // Cache for 1 hour
       return user.role;
     }
   } catch (error) {
     console.error("Failed to fetch user role:", error);
-    // Fallthrough to default return
   }
 
-  // ✅ FIXED: This ensures the function ALWAYS returns something
   return "Buyer";
 };
 

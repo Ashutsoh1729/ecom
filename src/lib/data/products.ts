@@ -2,7 +2,6 @@ import { db } from "@/db/client";
 import { products, stores } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { auth } from "@/auth";
-import { redis_client } from "@/util/upstash";
 
 export interface getSellerStoreAllDataOutputInterface {
   id: string;
@@ -88,37 +87,23 @@ export interface getAllProductInterface {
 
 // only extract the active products
 export const getAllProduct = async (): Promise<getAllProductInterface[]> => {
-  // we will cache the query with upstash
-
-  // first try to get the data from redis
-  let allProducts =
-    await redis_client.get<getAllProductInterface[]>("allProduct");
-
-  // if it don't find it then it will do db call and then cache it
-  if (allProducts === null) {
-    const allProductData = await db.query.products.findMany({
-      where: eq(products.status, "active"),
-      columns: {
-        storeId: false,
-        createdAt: false,
-        updatedAt: false,
-      },
-      with: {
-        variants: {
-          columns: {
-            price: true,
-            name: true,
-            id: true,
-          },
+  const allProductData = await db.query.products.findMany({
+    where: eq(products.status, "active"),
+    columns: {
+      storeId: false,
+      createdAt: false,
+      updatedAt: false,
+    },
+    with: {
+      variants: {
+        columns: {
+          price: true,
+          name: true,
+          id: true,
         },
       },
-    });
-    // redis sdk will stringify for us
-    redis_client.set("allProduct", allProductData);
+    },
+  });
 
-    // we have saved a network trip
-    allProducts = allProductData;
-  }
-
-  return allProducts;
+  return allProductData;
 };
