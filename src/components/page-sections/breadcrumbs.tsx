@@ -18,8 +18,8 @@ const Breadcrumb = () => {
   // console.log(segments);
 
   return (
-    <nav aria-label="breadcrumb" className="px-16 py-2 bg-slate-200">
-      <ol className="flex items-center space-x-2 text-[12px] font-medium text-gray-500 ">
+    <nav aria-label="breadcrumb" className="px-4 sm:px-8 lg:px-16 py-2 bg-slate-200 overflow-x-auto">
+      <ol className="flex items-center space-x-2 text-[12px] font-medium text-gray-500 whitespace-nowrap">
         {/* Home Link */}
         <li>
           <Link href="/" className="hover:text-blue-600 hover:underline">
@@ -45,7 +45,7 @@ const Breadcrumb = () => {
                 {isLast ? (
                   // The last segment is the current page, so it's not a link
                   <span
-                    className="font-semibold text-gray-800"
+                    className="font-semibold text-gray-800 truncate max-w-[120px] sm:max-w-none"
                     aria-current="page"
                   >
                     {capitalize(decodeURIComponent(segment))}
